@@ -34,6 +34,7 @@ public class CustomExceptionHandlerTest {
 
     private void shouldReturnErrorResponse(){
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getBody().getStatus());
         assertEquals("Shape is invalid", responseEntity.getBody().getMessage());
     }
 
