@@ -1,16 +1,18 @@
 package com.linhlx.shapeservice.controller;
 
-import com.linhlx.shapeservice.model.ShapeCategory;
+import com.linhlx.shapeservice.dto.AreaDTO;
+import com.linhlx.shapeservice.dto.ShapeCategoryDTO;
+import com.linhlx.shapeservice.model.Shape;
 import com.linhlx.shapeservice.service.ShapeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController("/api/shapes")
+@RestController
+@RequestMapping("/api/shapes")
 public class ShapeRestController {
 
     private final ShapeService shapeService;
@@ -20,9 +22,24 @@ public class ShapeRestController {
         this.shapeService = shapeService;
     }
 
+    @RequestMapping(value = "", method = RequestMethod.GET)
+    public ResponseEntity<List<Shape>> getAllShapes(){
+        return new ResponseEntity(shapeService.getAllShapes(), HttpStatus.OK);
+    }
 
-    @RequestMapping(name = "/category")
-    public ResponseEntity<List<ShapeCategory>> getAllShapeCategories(){
-        return new ResponseEntity(shapeService.getAllShapeCategory(), HttpStatus.OK);
+    @RequestMapping(value = "", method = RequestMethod.POST)
+    public ResponseEntity<List<Shape>> createShape(@RequestBody Shape shape){
+        Shape createdShape = shapeService.createShape(shape);
+        return new ResponseEntity(createdShape.getId(), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/categories", method = RequestMethod.GET)
+    public ResponseEntity<List<ShapeCategoryDTO>> getAllShapeCategories(){
+        return new ResponseEntity(shapeService.getAllShapeCategories(), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/area", method = RequestMethod.POST)
+    public ResponseEntity<AreaDTO> calculateArea(@RequestBody Shape shape){
+        return new ResponseEntity(shapeService.getArea(shape), HttpStatus.OK);
     }
 }
