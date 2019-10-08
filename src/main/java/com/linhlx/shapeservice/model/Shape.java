@@ -16,11 +16,11 @@ public class Shape {
     @NotEmpty(message = "Shape name cannot be empty")
     private String shapeName;
 
+    @NotNull(message = "Sizes cannot be null")
     @ElementCollection(fetch = FetchType.EAGER)
     @MapKeyColumn(name="name")
     @Column(name = "size")
     @CollectionTable(name = "size", joinColumns = @JoinColumn(name = "shape_id"))
-    @NotNull(message = "Sizes cannot be null")
     private Map<String, Double> sizes;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)

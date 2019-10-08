@@ -30,7 +30,7 @@ public class ShapeRestController {
     @RequestMapping(value = "", method = RequestMethod.POST)
     public ResponseEntity<List<Shape>> createShape(@RequestBody Shape shape){
         Shape createdShape = shapeService.createShape(shape);
-        return new ResponseEntity(createdShape.getId(), HttpStatus.OK);
+        return new ResponseEntity(createdShape.getId(), HttpStatus.CREATED);
     }
 
     @RequestMapping(value = "/categories", method = RequestMethod.GET)

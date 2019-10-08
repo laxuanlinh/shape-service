@@ -15,7 +15,7 @@ import java.util.Map;
 public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler({ShapeException.class})
-    public ResponseEntity<ErrorResponse> badRequest(HttpServletRequest req, Exception exception) {
+    public ResponseEntity<ErrorResponse> handleBadRequest(HttpServletRequest req, Exception exception) {
         ErrorResponse errorResponse = new ErrorResponse(exception.getMessage(), HttpStatus.BAD_REQUEST);
         return new ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST);
     }
