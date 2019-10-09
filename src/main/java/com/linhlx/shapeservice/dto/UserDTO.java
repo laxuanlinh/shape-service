@@ -7,9 +7,12 @@ public class UserDTO {
     private String username;
     private String role;
 
+    private Boolean enabled;
+
     public UserDTO(User user){
         this.username = user.getUsername();
         this.role = user.getRole().getAuthority();
+        this.enabled = user.getEnabled();
     }
 
     public UserDTO() {
@@ -26,5 +29,9 @@ public class UserDTO {
 
     public String getRole() {
         return role;
+    }
+
+    public Boolean getEnabled() {
+        return enabled;
     }
 }

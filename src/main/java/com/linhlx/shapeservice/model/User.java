@@ -14,7 +14,7 @@ public class User {
     @NotNull
     private Boolean enabled;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "user")
     private Role role;
 
     public User() {

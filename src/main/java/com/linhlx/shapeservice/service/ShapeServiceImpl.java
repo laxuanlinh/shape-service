@@ -20,11 +20,9 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
-@Transactional
 public class ShapeServiceImpl implements ShapeService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ShapeServiceImpl.class);
@@ -90,21 +88,32 @@ public class ShapeServiceImpl implements ShapeService {
 
     @Override
     public AreaDTO getArea(Shape shape) {
-        ShapeCategory shapeCategory = this.getShapeCategoryByDimensions(shape);
+        ShapeCategory shapeCategory = this.getShapeCategoryBySizes(shape.getSizes().entrySet());
         Double area = this.calculateArea(shape.getSizes(), shapeCategory.getFormula());
         return new AreaDTO(area, new ShapeCategoryDTO(shapeCategory));
     }
 
-    private ShapeCategory getShapeCategoryByDimensions(Shape shape){
+    private ShapeCategory getShapeCategoryBySizes(Set<Map.Entry<String, Double>> sizeEntrySet){
+        Set<String> dimensions = this.getDimensionsFromSizes(sizeEntrySet);
+        List<ShapeCategory> shapeCategories = this.getCategoriesFromDimensions(dimensions);
+
+        return shapeCategories.get(0);
+    }
+
+    private Set<String> getDimensionsFromSizes(Set<Map.Entry<String, Double>> sizeEntrySet){
         Set<String> dimensions = Sets.newHashSet();
-        for (Map.Entry<String, Double> entry : shape.getSizes().entrySet()){
+        for (Map.Entry<String, Double> entry : sizeEntrySet){
             dimensions.add(entry.getKey());
         }
+
+        return dimensions;
+    }
+
+    private List<ShapeCategory> getCategoriesFromDimensions(Set<String> dimensions){
         List<ShapeCategory> shapeCategories = shapeCategoryRepository.getShapeCategoryByDimensions(dimensions);
         if (shapeCategories.isEmpty())
             throw new ShapeException("Shape category not found");
-
-        return shapeCategories.get(0);
+        return shapeCategories;
     }
 
     private Double calculateArea(Map<String, Double> sizes, String formula){

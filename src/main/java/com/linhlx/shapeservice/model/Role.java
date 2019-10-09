@@ -9,12 +9,12 @@ import javax.validation.constraints.NotNull;
 public class Role {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @NotEmpty(message = "Role cannot be empty")
     private String authority;
-    @NotEmpty(message = "Username cannot be empty")
-    @OneToOne
+    @NotNull(message = "Username cannot be empty")
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "username")
     private User user;
 
