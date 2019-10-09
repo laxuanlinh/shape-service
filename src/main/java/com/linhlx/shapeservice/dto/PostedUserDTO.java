@@ -23,4 +23,7 @@ public class PostedUserDTO {
     public String getRole() {
         return role;
     }
+
+    public PostedUserDTO() {
+    }
 }

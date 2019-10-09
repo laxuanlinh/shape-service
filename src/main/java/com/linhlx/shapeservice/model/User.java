@@ -2,7 +2,6 @@ package com.linhlx.shapeservice.model;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -14,6 +13,9 @@ public class User {
     private String password;
     @NotNull
     private Boolean enabled;
+
+    @OneToOne(mappedBy = "user")
+    private Role role;
 
     public User() {
     }
@@ -40,5 +42,20 @@ public class User {
 
     public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    public User(String username, @NotNull String password, @NotNull Boolean enabled) {
+        this.username = username;
+        this.password = password;
+        this.enabled = enabled;
+        this.role = role;
     }
 }

@@ -1,10 +1,10 @@
 package com.linhlx.shapeservice.repository;
 
-import com.linhlx.shapeservice.model.User;
+import com.linhlx.shapeservice.model.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, String> {
+public interface RoleRepository extends JpaRepository<Role, Long> {
 
 }

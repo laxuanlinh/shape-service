@@ -1,6 +1,5 @@
 package com.linhlx.shapeservice.dto;
 
-import com.linhlx.shapeservice.model.Role;
 import com.linhlx.shapeservice.model.User;
 
 public class UserDTO {
@@ -8,9 +7,9 @@ public class UserDTO {
     private String username;
     private String role;
 
-    public UserDTO(User user, Role role){
+    public UserDTO(User user){
         this.username = user.getUsername();
-        this.role = role.getName();
+        this.role = user.getRole().getAuthority();
     }
 
     public UserDTO() {

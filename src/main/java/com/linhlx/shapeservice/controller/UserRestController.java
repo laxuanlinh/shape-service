@@ -22,23 +22,5 @@ public class UserRestController {
         this.userService = userService;
     }
 
-    @RequestMapping(value = "", method = RequestMethod.GET)
-    public List<UserDTO> getAllUsers(){
-        return userService.getAllUsers();
-    }
 
-    @RequestMapping(value = "", method = RequestMethod.POST)
-    public UserDTO createUser(@RequestBody PostedUserDTO postedUserDTO){
-        return userService.createUser(postedUserDTO);
-    }
-
-    @RequestMapping(value = "", method = RequestMethod.GET)
-    public UserDTO updateUser(@RequestBody PostedUserDTO postedUserDTO){
-        return userService.updateUser(postedUserDTO);
-    }
-
-    @RequestMapping(value = "", method = RequestMethod.GET)
-    public UserDTO deleteUser(@RequestBody UserDTO userDTO){
-        return userService.deleteUser(userDTO);
-    }
 }

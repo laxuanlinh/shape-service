@@ -1,20 +1,39 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <link rel="stylesheet" href="../../static/styles.css"/>
+    <link rel="stylesheet" th:href="@{/styles.css}"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css"/>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script type="text/javascript" src="../../static/app.js"></script>
+    <script type="text/javascript" th:src="@{/app.js}"></script>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
 </head>
 <body>
-    <div class="container">
-        <table>
-            <tr class="table">
-                <th>No.</th>
-                <th>Name</th>
-                <th>Username</th>
-                <th>Role</th>
-            </tr>
-        </table>
+<div class="container center">
+    <div class="row">
+        <div class="col-sm">
+            <div class="form" id="form">
+                <input type="text" class="form-control" name="username">
+                <input type="password" class="form-control" name="password">
+                <input type="text" class="form-control" name="role">
+                <button class="form-control" id="submit">Button</button>
+            </div>
+        </div>
+        <div class="col-lg">
+            <table class="table">
+                <tr>
+                    <th>No.</th>
+                    <th>Username</th>
+                    <th>Role</th>
+                </tr>
+                <tr th:each="user : ${users}">
+                    <td>1</td>
+                    <td th:text="${user.username}"></td>
+                    <td th:text="${user.role}"></td>
+                </tr>
+            </table>
+        </div>
     </div>
+</div>
 </body>
 </html>

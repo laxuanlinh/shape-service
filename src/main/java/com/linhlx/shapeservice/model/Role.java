@@ -1,25 +1,29 @@
 package com.linhlx.shapeservice.model;
 
 import javax.persistence.*;
-import java.util.List;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 @Entity
+@Table(name = "authorities")
 public class Role {
 
     @Id
     @GeneratedValue
     private Long id;
-    private String name;
-
-    @ManyToMany
-    private List<User> users;
+    @NotEmpty(message = "Role cannot be empty")
+    private String authority;
+    @NotEmpty(message = "Username cannot be empty")
+    @OneToOne
+    @JoinColumn(name = "username")
+    private User user;
 
     public Role() {
     }
 
-    public Role(Long id, String name) {
-        this.id = id;
-        this.name = name;
+    public Role(String authority, User user) {
+        this.authority = authority;
+        this.user = user;
     }
 
     public Long getId() {
@@ -30,11 +34,19 @@ public class Role {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getAuthority() {
+        return authority;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setAuthority(String authority) {
+        this.authority = authority;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }
