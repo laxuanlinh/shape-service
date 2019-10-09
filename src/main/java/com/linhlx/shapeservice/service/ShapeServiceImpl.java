@@ -47,13 +47,16 @@ public class ShapeServiceImpl implements ShapeService {
         if (shape == null)
             throw new ShapeException("Shape cannot be null");
 
-        ShapeCategory shapeCategory = shapeCategoryRepository.findById(shape.getShapeCategory().getShapeCategoryName())
-                                                            .orElseThrow(()->new ShapeException("Shape category cannot be found"));
+        ShapeCategory shapeCategory = this.validateShapeCategory(shape);
         shape.setShapeCategory(shapeCategory);
-
         this.validateShapeSizes(shape);
 
         return shapeRepository.save(shape);
+    }
+
+    private ShapeCategory validateShapeCategory(Shape shape){
+        return shapeCategoryRepository.findById(shape.getShapeCategory().getShapeCategoryName())
+                .orElseThrow(()->new ShapeException("Shape category cannot be found"));
     }
 
     private void validateShapeSizes(Shape shape) {
@@ -85,13 +88,12 @@ public class ShapeServiceImpl implements ShapeService {
 
     @Override
     public AreaDTO getArea(Shape shape) {
-        ShapeCategory shapeCategory = this.getShapeCategory(shape);
+        ShapeCategory shapeCategory = this.getShapeCategoryByDimensions(shape);
         Double area = this.calculateArea(shape.getSizes(), shapeCategory.getFormula());
-
         return new AreaDTO(area, new ShapeCategoryDTO(shapeCategory));
     }
 
-    private ShapeCategory getShapeCategory(Shape shape){
+    private ShapeCategory getShapeCategoryByDimensions(Shape shape){
         Set<String> dimensions = Sets.newHashSet();
         for (Map.Entry<String, Double> entry : shape.getSizes().entrySet()){
             dimensions.add(entry.getKey());

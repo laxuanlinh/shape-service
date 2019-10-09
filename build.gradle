@@ -23,7 +23,7 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	compile group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '2.1.9.RELEASE'
 	compile group: 'com.google.guava', name: 'guava', version: '22.0'
-
+	compile group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf'
 }
 
 dependencyManagement {

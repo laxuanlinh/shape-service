@@ -1,46 +1,21 @@
 package com.linhlx.shapeservice.model;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Entity
+@Table(name = "users")
 public class User {
 
     @Id
-    @GeneratedValue
-    private Long id;
-    private String name;
     private String username;
+    @NotNull
     private String password;
-
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private List<Role> roles;
-
-    public User(Long id, String name, String username, String password, List<Role> roles) {
-        this.id = id;
-        this.name = name;
-        this.username = username;
-        this.password = password;
-        this.roles = roles;
-    }
+    @NotNull
+    private Boolean enabled;
 
     public User() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getUsername() {
@@ -59,11 +34,11 @@ public class User {
         this.password = password;
     }
 
-    public List<Role> getRoles() {
-        return roles;
+    public Boolean getEnabled() {
+        return enabled;
     }
 
-    public void setRoles(List<Role> roles) {
-        this.roles = roles;
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 }
