@@ -53,6 +53,13 @@ public class ShapeServiceImpl implements ShapeService {
     }
 
     @Override
+    public List<ShapeDTO> getAllShapesForUser(String username) {
+        List<Shape> shapes = shapeRepository.findAllByUsername(username);
+        return this.convertToShapeDTO(shapes);
+    }
+
+
+    @Override
     public Shape createShapeForCurrentUser(Shape shape, String currentUsername) {
         User user = this.validateUser(currentUsername);
         return this.createShape(shape, user);
@@ -102,12 +109,8 @@ public class ShapeServiceImpl implements ShapeService {
 
     private void validateShapeRules(Shape shape) {
         if (!Strings.isNullOrEmpty(shape.getShapeCategory().getRules())) {
-            String[] rules = shape.getShapeCategory().getRules().split(",");
-            for (String rule : rules){
-                String[] ruleExpressionItems = rule.split(" ");
-                String ruleExpression = this.convertFormulaToOperations(shape.getSizes(), ruleExpressionItems);
-                this.evaluateRuleExpression(ruleExpression);
-            }
+            String ruleExpressionValues = this.convertFormulaToOperations(shape.getSizes(), shape.getShapeCategory().getRules().split(" "));
+            this.evaluateRuleExpression(ruleExpressionValues);
         }
     }
 
@@ -181,7 +184,7 @@ public class ShapeServiceImpl implements ShapeService {
     }
 
     private Boolean isOperand(String formulaItem){
-        return !Arrays.asList("*", "-", "+", "/", "(", ")", "=", ">", "<", ">=", "<=").contains(formulaItem) && !this.isNumber(formulaItem);
+        return !Arrays.asList("*", "-", "+", "/", "(", ")", "=", ">", "<", ">=", "<=", "&&", "||").contains(formulaItem) && !this.isNumber(formulaItem);
     }
 
     private boolean isNumber(String formulaItem) {
@@ -207,6 +210,11 @@ public class ShapeServiceImpl implements ShapeService {
         } catch (ScriptException e) {
             throw new ShapeException("Unable to read and evaluate expression: "+expression);
         }
+    }
+
+    @Override
+    public ShapeCategoryDTO createCategory(ShapeCategory shapeCategory) {
+        return new ShapeCategoryDTO(shapeCategoryRepository.save(shapeCategory));
     }
 
 }

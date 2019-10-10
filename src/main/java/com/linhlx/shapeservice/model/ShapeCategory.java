@@ -1,6 +1,8 @@
 package com.linhlx.shapeservice.model;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Set;
 
@@ -15,11 +17,12 @@ public class ShapeCategory {
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "dimension", joinColumns = @JoinColumn(name = "shape_category_name"))
     @Column(name = "dimension")
+    @NotNull(message = "Dimensions cannot be null")
     private Set<String> dimensions;
 
     @OneToMany(mappedBy = "shapeCategory")
     private List<Shape> shapes;
-
+    @NotEmpty(message = "Formula cannot be empty")
     private String formula;
 
     private String rules;

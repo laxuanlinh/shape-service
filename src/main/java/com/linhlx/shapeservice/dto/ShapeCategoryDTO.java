@@ -53,4 +53,8 @@ public class ShapeCategoryDTO {
     public void setFormula(String formula) {
         this.formula = formula;
     }
+
+    public String getRules() {
+        return rules;
+    }
 }

@@ -17,6 +17,8 @@ import org.assertj.core.util.Sets;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 import java.util.*;
 
 import static org.junit.Assert.*;
@@ -37,6 +39,7 @@ public class ShapeServiceTest {
     private Shape calculatedShape;
     private AreaDTO areaDTO;
     private User user;
+    private ShapeCategoryDTO shapeCategoryDTO;
 
     @Before
     public void setUp(){
@@ -78,12 +81,24 @@ public class ShapeServiceTest {
         circleShapeCategory.setRules("radius > 0");
         when(shapeCategoryRepository.getShapeCategoryByDimensions(anySet())).thenReturn(Lists.newArrayList(circleShapeCategory));
         when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
+        when(shapeRepository.findAllByUsername(anyString())).thenReturn(shapes);
+        when(shapeCategoryRepository.save(any())).thenReturn(rectangleShapeCategory);
     }
 
     @Test
     public void shouldReturnAllShapeDTOS(){
         whenGetAllShapes();
         shouldGetAllShapeDTOS();
+    }
+
+    @Test
+    public void shouldReturnShapesForUser(){
+        whenGetShapesForUsers();
+        shouldGetAllShapeDTOS();
+    }
+
+    private void whenGetShapesForUsers() {
+        shapeDTOS = shapeService.getAllShapesForUser("username");
     }
 
     @Test
@@ -172,6 +187,22 @@ public class ShapeServiceTest {
         withRadius(10.0);
         butRulesInvalid();
         whenGetArea();
+    }
+
+    @Test
+    public void shouldCreateCategory(){
+        whenCreateCategory();
+        shouldReturnCategoryDTO();
+    }
+
+    private void shouldReturnCategoryDTO() {
+        assertEquals("Rectangle", shapeCategoryDTO.getShapeCategoryName());
+        assertEquals("width * length", shapeCategoryDTO.getFormula());
+        assertEquals("width > 0,length > 0", shapeCategoryDTO.getRules());
+    }
+
+    private void whenCreateCategory() {
+        shapeCategoryDTO = shapeService.createCategory(rectangleShapeCategory);
     }
 
     private void whenCreateShapeWithCurrentUser() {
