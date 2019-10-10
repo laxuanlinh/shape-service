@@ -32,13 +32,12 @@
         <div class="col-lg">
             <table class="table">
                 <tr>
-                    <th>No.</th>
                     <th>Username</th>
                     <th>Role</th>
                     <th>Active</th>
+                    <th>Action</th>
                 </tr>
                 <tr th:each="user : ${users}" class="user">
-                    <td>1</td>
                     <td th:text="${user.username}" class="username"></td>
                     <td th:text="${user.role}" class="role"></td>
                     <td th:text="${user.enabled}"></td>

@@ -7,7 +7,6 @@ import com.linhlx.shapeservice.service.ShapeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -31,7 +30,7 @@ public class ShapeRestController {
 
     @RequestMapping(value = "", method = RequestMethod.POST)
     public ResponseEntity<List<Shape>> createShape(@RequestBody Shape shape, Principal currentUser){
-        Shape createdShape = shapeService.createShape(shape, currentUser.getName());
+        Shape createdShape = shapeService.createShapeForCurrentUser(shape, currentUser.getName());
         return new ResponseEntity(createdShape.getId(), HttpStatus.CREATED);
     }
 

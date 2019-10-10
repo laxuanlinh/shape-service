@@ -53,12 +53,25 @@ public class ShapeServiceImpl implements ShapeService {
     }
 
     @Override
-    public Shape createShape(Shape shape, String currentUsername) {
+    public Shape createShapeForCurrentUser(Shape shape, String currentUsername) {
+        User user = this.validateUser(currentUsername);
+        return this.createShape(shape, user);
+    }
+
+    @Override
+    public Shape createShapeForOtherUser(Shape shape) {
+        if (shape == null)
+            throw new ShapeException("Shape cannot be null");
+
+        User user = this.validateUser(shape.getUser().getUsername());
+        return this.createShape(shape, user);
+    }
+
+    private Shape createShape(Shape shape, User user){
         if (shape == null)
             throw new ShapeException("Shape cannot be null");
 
         ShapeCategory shapeCategory = this.validateShapeCategory(shape);
-        User user = this.validateUser(shape, currentUsername);
         shape.setShapeCategory(shapeCategory);
         shape.setUser(user);
         this.validateShapeSizes(shape);
@@ -72,17 +85,9 @@ public class ShapeServiceImpl implements ShapeService {
                 .orElseThrow(()->new ShapeException("Shape category cannot be found"));
     }
 
-    private User validateUser(Shape shape, String currentUsername){
-        String username = this.getUsername(shape, currentUsername);
+    private User validateUser(String username){
         return userRepository.findById(username)
                 .orElseThrow(()->new UserException("User not found for shape"));
-    }
-
-    private String getUsername(Shape shape, String currentUsername){
-        if (shape.getUser()==null || shape.getUser().getUsername() == null)
-            return currentUsername;
-        else
-            return shape.getUser().getUsername();
     }
 
     private void validateShapeSizes(Shape shape) {

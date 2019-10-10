@@ -87,15 +87,14 @@ public class ShapeServiceTest {
     }
 
     @Test
-    public void shouldCreateShape(){
-        whenCreateShape();
+    public void shouldCreateShapeForOtherUser(){
+        whenCreateShapeForOtherUser();
         shouldReturnShape();
     }
 
     @Test
-    public void shouldCreateShapeWhenNoUsernameProvided(){
-        givenShapeWithNoUsername();
-        whenCreateShape();
+    public void shouldCreateShapeWithCurrentUser(){
+        whenCreateShapeWithCurrentUser();
         shouldReturnShape();
     }
 
@@ -120,7 +119,13 @@ public class ShapeServiceTest {
     @Test(expected = ShapeException.class)
     public void shouldThrowExceptionWhenShapeIsNull(){
         givenShapeIsNull();
-        whenCreateShape();
+        whenCreateShapeForOtherUser();
+    }
+
+    @Test(expected = ShapeException.class)
+    public void shouldThrowExceptionWhenShapeIsNullAndCreateForCurrentUser(){
+        givenShapeIsNull();
+        whenCreateShapeWithCurrentUser();
     }
 
     @Test
@@ -167,6 +172,14 @@ public class ShapeServiceTest {
         withRadius(10.0);
         butRulesInvalid();
         whenGetArea();
+    }
+
+    private void whenCreateShapeWithCurrentUser() {
+        createdShape = shapeService.createShapeForCurrentUser(shape, "username");
+    }
+
+    private void whenCreateShapeForOtherUser() {
+        createdShape = shapeService.createShapeForOtherUser(shape);
     }
 
     private void butRulesInvalid() {
@@ -239,7 +252,7 @@ public class ShapeServiceTest {
     }
 
     private void whenCreateShape() {
-        createdShape = shapeService.createShape(shape, "username");
+        createdShape = shapeService.createShapeForOtherUser(shape);
     }
 
     private void givenShapeWithNoUsername() {

@@ -3,6 +3,7 @@
     <link rel="stylesheet" th:href="@{/styles.css}"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css"/>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.1/jquery.validate.min.js"></script>
     <script type="text/javascript" th:src="@{/shape.js}"></script>
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
@@ -11,41 +12,52 @@
 <body>
 <div class="container center">
     <div class="row">
-        <div class="col-sm">
+        <div class="col-lg-4">
             <div class="form" id="form">
                 <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" class="form-control" name="username" id="username">
+                    <label for="shapeName">Name</label>
+                    <input type="text" class="form-control" name="shapeName" id="shapeName">
+                </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select class="form-control" name="shapeCategoryName" id="shapeCategoryName">
+                            <option th:each="category : ${categories}"
+                                    th:value="${category.shapeCategoryName}"
+                                    th:utext="${category.shapeCategoryName}"
+                                    th:data-dimensions="${category.dimensions}"/>
+                        </select>
+                    </div>
+                <div id="sizes">
                 </div>
                 <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" class="form-control" name="password" id="password">
-                </div>
-                <div class="form-group">
-                    <label for="role">Role</label>
-                    <input type="text" class="form-control" name="role" id="role">
+                    <label>User</label>
+                    <select class="form-control" name="username" id="username">
+                        <option th:each="user : ${users}"
+                                th:object="${user}"
+                                th:if="${user.role} == 'ROLE_USER'"
+                                th:value="${user.username}"
+                                th:utext="${user.username}"/>
+                    </select>
                 </div>
 
                 <button class="btn btn-primary" id="submit">Submit</button>
             </div>
         </div>
-        <div class="col-lg">
+        <div class="col-lg-6">
             <table class="table">
                 <tr>
-                    <th>No.</th>
-                    <th>Username</th>
-                    <th>Role</th>
-                    <th>Active</th>
+                    <th>Name</th>
+                    <th>Sizes</th>
+                    <th>Category</th>
                 </tr>
-                <tr th:each="user : ${users}" class="user">
-                    <td>1</td>
-                    <td th:text="${user.username}" class="username"></td>
-                    <td th:text="${user.role}" class="role"></td>
-                    <td th:text="${user.enabled}"></td>
+                <tr th:each="shape : ${shapes}" class="shape">
+                    <td th:text="${shape.shapeName}" class="shapeName"></td>
                     <td>
-                        <button th:if="${user.enabled}" class="btn btn-warning edit">Edit</button>
-                        <button th:if="${user.enabled}" class="btn btn-danger delete">Delete</button>
+                        <p th:each="size : ${shape.sizes}">
+                            [[${size.key}]]: [[${size.value}]]
+                        </p>
                     </td>
+                    <td th:text="${shape.shapeCategory.shapeCategoryName}"></td>
                 </tr>
             </table>
         </div>

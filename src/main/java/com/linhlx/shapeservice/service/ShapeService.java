@@ -13,7 +13,8 @@ import java.util.List;
 public interface ShapeService {
 
     List<ShapeDTO> getAllShapes();
-    Shape createShape(Shape shape, String username);
+    Shape createShapeForCurrentUser(Shape shape, String username);
+    Shape createShapeForOtherUser(Shape shape);
     List<ShapeCategoryDTO> getAllShapeCategories();
     AreaDTO getArea(Shape shape);
 

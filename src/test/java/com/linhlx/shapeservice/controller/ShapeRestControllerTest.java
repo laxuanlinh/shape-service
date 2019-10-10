@@ -30,7 +30,7 @@ public class ShapeRestControllerTest {
         when(shapeService.getAllShapes()).thenReturn(Lists.newArrayList());
         when(shapeService.getAllShapeCategories()).thenReturn(Lists.newArrayList());
         when(shapeService.getArea(any())).thenReturn(new AreaDTO());
-        when(shapeService.createShape(any(), any())).thenReturn(new Shape());
+        when(shapeService.createShapeForCurrentUser(any(), any())).thenReturn(new Shape());
     }
 
     @Test
