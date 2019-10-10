@@ -52,7 +52,7 @@ public class User {
         this.role = role;
     }
 
-    public User(String username, @NotNull String password, @NotNull Boolean enabled) {
+    public User(String username, @NotNull String password, @NotNull Boolean enabled, Role role) {
         this.username = username;
         this.password = password;
         this.enabled = enabled;

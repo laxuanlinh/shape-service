@@ -10,6 +10,6 @@ public interface UserService {
     List<UserDTO> getAllUsers();
     UserDTO createUser(PostedUserDTO postedUserDTO);
     UserDTO updateUser(PostedUserDTO postedUserDTO);
-    String deleteUser(String username);
+    UserDTO deleteUser(String username);
 
 }

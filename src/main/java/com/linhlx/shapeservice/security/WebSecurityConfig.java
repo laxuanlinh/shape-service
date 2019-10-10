@@ -39,10 +39,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().ignoringAntMatchers("/api/**")
                 .and()
                 .authorizeRequests()
-                .antMatchers("/static/**").permitAll()
-                .antMatchers("/**").authenticated()
                 .antMatchers("/users/**").hasRole("ADMIN")
-                .antMatchers("/api/users/**").hasRole("ADMIN")
+                .antMatchers("/**").authenticated()
+                .antMatchers("/static/**").permitAll()
+
                 .and().httpBasic()
                 .and().formLogin();
     }

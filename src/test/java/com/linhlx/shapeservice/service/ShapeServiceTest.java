@@ -6,10 +6,13 @@ import com.linhlx.shapeservice.dto.AreaDTO;
 import com.linhlx.shapeservice.dto.ShapeCategoryDTO;
 import com.linhlx.shapeservice.dto.ShapeDTO;
 import com.linhlx.shapeservice.exception.ShapeException;
+import com.linhlx.shapeservice.model.Role;
 import com.linhlx.shapeservice.model.Shape;
 import com.linhlx.shapeservice.model.ShapeCategory;
+import com.linhlx.shapeservice.model.User;
 import com.linhlx.shapeservice.repository.ShapeCategoryRepository;
 import com.linhlx.shapeservice.repository.ShapeRepository;
+import com.linhlx.shapeservice.repository.UserRepository;
 import org.assertj.core.util.Sets;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,6 +25,7 @@ import static org.mockito.Mockito.*;
 public class ShapeServiceTest {
 
     private ShapeService shapeService;
+    private UserRepository userRepository;
     private ShapeCategoryRepository shapeCategoryRepository;
     private ShapeRepository shapeRepository;
     private List<ShapeDTO> shapeDTOS;
@@ -32,15 +36,19 @@ public class ShapeServiceTest {
     private List<ShapeCategoryDTO> categoryDTOS;
     private Shape calculatedShape;
     private AreaDTO areaDTO;
+    private User user;
 
     @Before
     public void setUp(){
         shapeRepository = mock(ShapeRepository.class);
         shapeCategoryRepository = mock(ShapeCategoryRepository.class);
-        shapeService = new ShapeServiceImpl(shapeCategoryRepository, shapeRepository);
+        userRepository = mock(UserRepository.class);
+        shapeService = new ShapeServiceImpl(shapeCategoryRepository, shapeRepository, userRepository);
 
-        Shape shape1 = new Shape(1l, "test shape1", Maps.newHashMap(), new ShapeCategory());
-        Shape shape2 = new Shape(2l, "test shape2", Maps.newHashMap(), new ShapeCategory());
+        user = new User("username", "password", true, new Role());
+
+        Shape shape1 = new Shape(1l, "test shape1", Maps.newHashMap(), new ShapeCategory(), user);
+        Shape shape2 = new Shape(2l, "test shape2", Maps.newHashMap(), new ShapeCategory(), user);
         List<Shape> shapes = Lists.newArrayList(shape1, shape2);
         when(shapeRepository.findAll()).thenReturn(shapes);
 
@@ -48,12 +56,13 @@ public class ShapeServiceTest {
         rectangleShapeCategory.setShapeCategoryName("Rectangle");
         rectangleShapeCategory.setDimensions(Sets.newHashSet(Arrays.asList("width", "length")));
         rectangleShapeCategory.setFormula("width * length");
+        rectangleShapeCategory.setRules("width > 0,length > 0");
         when(shapeCategoryRepository.findById(anyString())).thenReturn(Optional.of(rectangleShapeCategory));
 
         Map<String, Double> sizes = Maps.newHashMap();
         sizes.put("width", 100.0);
         sizes.put("length", 200.0);
-        shape = new Shape(1l, "created shape", sizes, rectangleShapeCategory);
+        shape = new Shape(1l, "created shape", sizes, rectangleShapeCategory, user);
         when(shapeRepository.save(shape)).thenReturn(shape);
 
         ShapeCategory shapeCategory1 = new ShapeCategory();
@@ -66,7 +75,9 @@ public class ShapeServiceTest {
         circleShapeCategory.setShapeCategoryName("Rectangle");
         circleShapeCategory.setDimensions(Sets.newHashSet(Arrays.asList("radius")));
         circleShapeCategory.setFormula("radius * radius * 3.14");
+        circleShapeCategory.setRules("radius > 0");
         when(shapeCategoryRepository.getShapeCategoryByDimensions(anySet())).thenReturn(Lists.newArrayList(circleShapeCategory));
+        when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
     }
 
     @Test
@@ -77,6 +88,13 @@ public class ShapeServiceTest {
 
     @Test
     public void shouldCreateShape(){
+        whenCreateShape();
+        shouldReturnShape();
+    }
+
+    @Test
+    public void shouldCreateShapeWhenNoUsernameProvided(){
+        givenShapeWithNoUsername();
         whenCreateShape();
         shouldReturnShape();
     }
@@ -136,6 +154,26 @@ public class ShapeServiceTest {
         whenGetArea();
     }
 
+    @Test(expected = ShapeException.class)
+    public void shouldThrowExceptionWhenNotSatisfyRules(){
+        givenCalculatedShape();
+        withRadius(-10.0);
+        whenGetArea();
+    }
+
+    @Test(expected = ShapeException.class)
+    public void shouldThrowExceptionWhenRulesInvalid(){
+        givenCalculatedShape();
+        withRadius(10.0);
+        butRulesInvalid();
+        whenGetArea();
+    }
+
+    private void butRulesInvalid() {
+        circleShapeCategory.setRules("radius > 0 abcabc");
+        when(shapeCategoryRepository.getShapeCategoryByDimensions(anySet())).thenReturn(Lists.newArrayList(circleShapeCategory));
+    }
+
     private void butFormulaInvalid() {
         circleShapeCategory.setFormula("radius * radius * 3.14 abcabc");
         when(shapeCategoryRepository.getShapeCategoryByDimensions(anySet())).thenReturn(Lists.newArrayList(circleShapeCategory));
@@ -182,7 +220,7 @@ public class ShapeServiceTest {
         sizes.put("width", 100.0);
         sizes.put("length", 200.0);
         sizes.put("radius", 90.0);
-        shape = new Shape(1l, "created shape", sizes, rectangleShapeCategory);
+        shape = new Shape(1l, "created shape", sizes, rectangleShapeCategory, user);
     }
 
     private void givenShapeIsNull() {
@@ -196,17 +234,22 @@ public class ShapeServiceTest {
     private void givenShapeWithOnlyLength() {
         Map<String, Double> sizes = Maps.newHashMap();
         sizes.put("length", 200.0);
-        shape = new Shape(1l, "created shape", sizes, rectangleShapeCategory);
+        shape = new Shape(1l, "created shape", sizes, rectangleShapeCategory, user);
         when(shapeRepository.save(shape)).thenReturn(shape);
     }
 
     private void whenCreateShape() {
-        createdShape = shapeService.createShape(shape);
+        createdShape = shapeService.createShape(shape, "username");
+    }
+
+    private void givenShapeWithNoUsername() {
+        shape.setUser(null);
     }
 
     private void shouldReturnShape(){
         assertTrue(Long.valueOf(1l).equals(createdShape.getId()));
         assertEquals("created shape", createdShape.getShapeName());
+        assertEquals("username", createdShape.getUser().getUsername());
     }
 
     private void whenGetAllShapes() {

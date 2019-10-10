@@ -10,22 +10,25 @@ public class ShapeDTO {
     private String shapeName;
     private ShapeCategoryDTO shapeCategory;
     private Map<String, Double> sizes;
+    private String createdBy;
 
     public ShapeDTO(Shape shape){
         this.id = shape.getId();
         this.shapeName = shape.getShapeName();
         this.shapeCategory = new ShapeCategoryDTO(shape.getShapeCategory());
         this.sizes = shape.getSizes();
+        this.createdBy = shape.getUser().getUsername();
     }
 
     public ShapeDTO() {
     }
 
-    public ShapeDTO(Long id, String shapeName, ShapeCategoryDTO shapeCategory, Map<String, Double> sizes) {
+    public ShapeDTO(Long id, String shapeName, ShapeCategoryDTO shapeCategory, Map<String, Double> sizes, String createdBy) {
         this.id = id;
         this.shapeName = shapeName;
         this.shapeCategory = shapeCategory;
         this.sizes = sizes;
+        this.createdBy = createdBy;
     }
 
     public Long getId() {
@@ -58,5 +61,13 @@ public class ShapeDTO {
 
     public void setSizes(Map<String, Double> sizes) {
         this.sizes = sizes;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
     }
 }

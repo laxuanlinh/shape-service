@@ -28,14 +28,20 @@ public class Shape {
     @NotNull(message = "Shape category cannot be null")
     private ShapeCategory shapeCategory;
 
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "username")
+    @NotNull(message = "Creator cannot be null")
+    private User user;
+
     public Shape() {
     }
 
-    public Shape(Long id, String shapeName, Map<String, Double> sizes, ShapeCategory shapeCategory) {
+    public Shape(Long id, String shapeName, Map<String, Double> sizes, ShapeCategory shapeCategory, User user) {
         this.id = id;
         this.shapeName = shapeName;
         this.sizes = sizes;
         this.shapeCategory = shapeCategory;
+        this.user = user;
     }
 
     public Long getId() {
@@ -68,5 +74,13 @@ public class Shape {
 
     public void setSizes(Map<String, Double> sizes) {
         this.sizes = sizes;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

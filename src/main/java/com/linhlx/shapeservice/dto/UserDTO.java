@@ -18,11 +18,6 @@ public class UserDTO {
     public UserDTO() {
     }
 
-    public UserDTO(String username, String role) {
-        this.username = username;
-        this.role = role;
-    }
-
     public String getUsername() {
         return username;
     }

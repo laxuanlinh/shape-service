@@ -24,7 +24,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "", method = RequestMethod.GET)
-    public String index(Model model){
+    public String users(Model model){
         model.addAttribute("users", userService.getAllUsers());
         return "users";
     }
@@ -41,9 +41,7 @@ public class UserController {
 
     @RequestMapping(value = "/{username}", method = RequestMethod.DELETE)
     public ResponseEntity<UserDTO> deleteUser(@PathVariable("username") String username){
-        userService.deleteUser(username);
-        UserDTO userDTO = new UserDTO(username, null);
-        return new ResponseEntity<>(userDTO, HttpStatus.OK);
+        return new ResponseEntity<>(userService.deleteUser(username), HttpStatus.OK);
     }
 
 }

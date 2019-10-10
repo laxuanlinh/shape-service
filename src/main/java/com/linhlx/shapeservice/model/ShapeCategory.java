@@ -22,14 +22,17 @@ public class ShapeCategory {
 
     private String formula;
 
+    private String rules;
+
     public ShapeCategory() {
     }
 
-    public ShapeCategory(String shapeCategoryName, Set<String> dimensions, List<Shape> shapes, String formula) {
+    public ShapeCategory(String shapeCategoryName, Set<String> dimensions, List<Shape> shapes, String formula, String rules) {
         this.shapeCategoryName = shapeCategoryName;
         this.dimensions = dimensions;
         this.shapes = shapes;
         this.formula = formula;
+        this.rules = rules;
     }
 
     public String getShapeCategoryName() {
@@ -62,5 +65,13 @@ public class ShapeCategory {
 
     public void setFormula(String formula) {
         this.formula = formula;
+    }
+
+    public String getRules() {
+        return rules;
+    }
+
+    public void setRules(String rules) {
+        this.rules = rules;
     }
 }

@@ -1,39 +1,49 @@
 package com.linhlx.shapeservice.service;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import com.linhlx.shapeservice.dto.AreaDTO;
 import com.linhlx.shapeservice.dto.ShapeCategoryDTO;
 import com.linhlx.shapeservice.dto.ShapeDTO;
 import com.linhlx.shapeservice.exception.ShapeException;
+import com.linhlx.shapeservice.exception.UserException;
 import com.linhlx.shapeservice.model.Shape;
 import com.linhlx.shapeservice.model.ShapeCategory;
+import com.linhlx.shapeservice.model.User;
 import com.linhlx.shapeservice.repository.ShapeCategoryRepository;
 import com.linhlx.shapeservice.repository.ShapeRepository;
+import com.linhlx.shapeservice.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+import java.security.Principal;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
+@Transactional
 public class ShapeServiceImpl implements ShapeService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ShapeServiceImpl.class);
 
     private final ShapeCategoryRepository shapeCategoryRepository;
     private final ShapeRepository shapeRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public ShapeServiceImpl(ShapeCategoryRepository shapeCategoryRepository, ShapeRepository shapeRepository) {
+    public ShapeServiceImpl(ShapeCategoryRepository shapeCategoryRepository, ShapeRepository shapeRepository, UserRepository userRepository) {
         this.shapeCategoryRepository = shapeCategoryRepository;
         this.shapeRepository = shapeRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -43,13 +53,16 @@ public class ShapeServiceImpl implements ShapeService {
     }
 
     @Override
-    public Shape createShape(Shape shape) {
+    public Shape createShape(Shape shape, String currentUsername) {
         if (shape == null)
             throw new ShapeException("Shape cannot be null");
 
         ShapeCategory shapeCategory = this.validateShapeCategory(shape);
+        User user = this.validateUser(shape, currentUsername);
         shape.setShapeCategory(shapeCategory);
+        shape.setUser(user);
         this.validateShapeSizes(shape);
+        this.validateShapeRules(shape);
 
         return shapeRepository.save(shape);
     }
@@ -59,6 +72,19 @@ public class ShapeServiceImpl implements ShapeService {
                 .orElseThrow(()->new ShapeException("Shape category cannot be found"));
     }
 
+    private User validateUser(Shape shape, String currentUsername){
+        String username = this.getUsername(shape, currentUsername);
+        return userRepository.findById(username)
+                .orElseThrow(()->new UserException("User not found for shape"));
+    }
+
+    private String getUsername(Shape shape, String currentUsername){
+        if (shape.getUser()==null || shape.getUser().getUsername() == null)
+            return currentUsername;
+        else
+            return shape.getUser().getUsername();
+    }
+
     private void validateShapeSizes(Shape shape) {
         for (String dimension : shape.getShapeCategory().getDimensions()) {
             if (!shape.getSizes().containsKey(dimension))
@@ -66,6 +92,18 @@ public class ShapeServiceImpl implements ShapeService {
         }
         if (shape.getSizes().size() > shape.getShapeCategory().getDimensions().size())
             throw new ShapeException("Shape " + shape.getShapeName() + " cannot have more dimensions than category");
+    }
+
+
+    private void validateShapeRules(Shape shape) {
+        if (!Strings.isNullOrEmpty(shape.getShapeCategory().getRules())) {
+            String[] rules = shape.getShapeCategory().getRules().split(",");
+            for (String rule : rules){
+                String[] ruleExpressionItems = rule.split(" ");
+                String ruleExpression = this.convertFormulaToOperations(shape.getSizes(), ruleExpressionItems);
+                this.evaluateRuleExpression(ruleExpression);
+            }
+        }
     }
 
     private List<ShapeDTO> convertToShapeDTO(List<Shape> shapes) {
@@ -89,6 +127,8 @@ public class ShapeServiceImpl implements ShapeService {
     @Override
     public AreaDTO getArea(Shape shape) {
         ShapeCategory shapeCategory = this.getShapeCategoryBySizes(shape.getSizes().entrySet());
+        shape.setShapeCategory(shapeCategory);
+        this.validateShapeRules(shape);
         Double area = this.calculateArea(shape.getSizes(), shapeCategory.getFormula());
         return new AreaDTO(area, new ShapeCategoryDTO(shapeCategory));
     }
@@ -119,7 +159,7 @@ public class ShapeServiceImpl implements ShapeService {
     private Double calculateArea(Map<String, Double> sizes, String formula){
         String[] formulaItems = formula.split(" ");
         String mathOperations = this.convertFormulaToOperations(sizes, formulaItems);
-        return calculateFromString(mathOperations);
+        return (Double) evaluate(mathOperations);
     }
 
     private String convertFormulaToOperations(Map<String, Double> sizes, String[] formulaItems){
@@ -134,8 +174,9 @@ public class ShapeServiceImpl implements ShapeService {
 
         return mathOperations.toString();
     }
+
     private Boolean isOperand(String formulaItem){
-        return !Arrays.asList("*", "-", "+", "/", "(", ")").contains(formulaItem) && !this.isNumber(formulaItem);
+        return !Arrays.asList("*", "-", "+", "/", "(", ")", "=", ">", "<", ">=", "<=").contains(formulaItem) && !this.isNumber(formulaItem);
     }
 
     private boolean isNumber(String formulaItem) {
@@ -147,13 +188,19 @@ public class ShapeServiceImpl implements ShapeService {
         }
     }
 
-    private Double calculateFromString(String operations){
+    private void evaluateRuleExpression(String expression){
+        if (!(Boolean) this.evaluate(expression)){
+            throw new ShapeException("The shape does not satisfy shape category's requirements. This is wrong "+expression);
+        }
+    }
+
+    private Object evaluate(String expression){
         try {
             ScriptEngineManager mgr = new ScriptEngineManager();
             ScriptEngine engine = mgr.getEngineByName("JavaScript");
-            return (Double) engine.eval(operations);
-        } catch (ScriptException e){
-            throw new ShapeException("Unable to read and calculate operations: "+operations);
+            return engine.eval(expression);
+        } catch (ScriptException e) {
+            throw new ShapeException("Unable to read and evaluate expression: "+expression);
         }
     }
 

@@ -1,6 +1,7 @@
 package com.linhlx.shapeservice.controller;
 
 import com.linhlx.shapeservice.exception.ShapeException;
+import com.linhlx.shapeservice.exception.UserException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -10,10 +11,10 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import javax.servlet.http.HttpServletRequest;
 
-//@ControllerAdvice
+@ControllerAdvice
 public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler({ShapeException.class})
+    @ExceptionHandler({ShapeException.class, UserException.class})
     public ResponseEntity<ErrorResponse> handleBadRequest(HttpServletRequest req, Exception exception) {
         ErrorResponse errorResponse = new ErrorResponse(exception.getMessage(), HttpStatus.BAD_REQUEST);
         return new ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST);

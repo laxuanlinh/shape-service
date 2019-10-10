@@ -11,11 +11,13 @@ import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -49,7 +51,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private User saveUser(PostedUserDTO postedUserDTO){
-        User user = new User(postedUserDTO.getUsername(), encoder.encode(postedUserDTO.getPassword()), true);
+        User user = new User(postedUserDTO.getUsername(), encoder.encode(postedUserDTO.getPassword()), true, null);
         return userRepository.save(user);
     }
 
@@ -64,24 +66,28 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO updateUser(PostedUserDTO postedUserDTO) {
-        User user = userRepository.findById(postedUserDTO.getUsername()).orElseThrow(()->new UserException("User not found"));
-        Role role = roleRepository.findByUsername(postedUserDTO.getUsername());
+        User user = userRepository.findById(postedUserDTO.getUsername())
+                .orElseThrow(()->new UserException("User not found"));
+        Role role = roleRepository.findByUsername(postedUserDTO.getUsername())
+                .orElseThrow(()->new UserException("Role not found"));
         if (Strings.isNotEmpty(postedUserDTO.getPassword()))
             user.setPassword(encoder.encode(postedUserDTO.getPassword()));
         if (Strings.isNotEmpty(postedUserDTO.getRole()))
             role.setAuthority(postedUserDTO.getRole());
         userRepository.save(user);
         roleRepository.save(role);
+        user.setRole(role);
 
         return new UserDTO(user);
     }
 
     @Override
-    public String deleteUser(String username) {
-        User user = userRepository.findById(username).orElseThrow(()->new UserException("User not found"));
+    public UserDTO deleteUser(String username) {
+        User user = userRepository.findById(username)
+                .orElseThrow(()->new UserException("User not found"));
         user.setEnabled(false);
         userRepository.save(user);
 
-        return username;
+        return new UserDTO(user);
     }
 }

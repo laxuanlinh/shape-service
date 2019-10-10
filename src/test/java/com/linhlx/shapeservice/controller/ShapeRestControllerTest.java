@@ -9,6 +9,8 @@ import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.security.Principal;
+
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -17,16 +19,18 @@ public class ShapeRestControllerTest {
     private ShapeRestController shapeRestController;
     private ShapeService shapeService;
     private ResponseEntity entity;
+    private Principal principal;
 
     @Before
     public void setUp(){
         shapeService = mock(ShapeService.class);
         shapeRestController = new ShapeRestController(shapeService);
+        principal = mock(Principal.class);
 
         when(shapeService.getAllShapes()).thenReturn(Lists.newArrayList());
         when(shapeService.getAllShapeCategories()).thenReturn(Lists.newArrayList());
         when(shapeService.getArea(any())).thenReturn(new AreaDTO());
-        when(shapeService.createShape(any())).thenReturn(new Shape());
+        when(shapeService.createShape(any(), any())).thenReturn(new Shape());
     }
 
     @Test
@@ -54,7 +58,7 @@ public class ShapeRestControllerTest {
     }
 
     private void whenCreateShape() {
-        entity = shapeRestController.createShape(new Shape());
+        entity = shapeRestController.createShape(new Shape(), principal);
     }
 
     private void shouldReturnResponseEntityWithCreated() {
