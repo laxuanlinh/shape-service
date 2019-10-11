@@ -52,19 +52,21 @@ public class ShapeServiceImpl implements ShapeService {
         return this.convertToShapeDTO(shapes);
     }
 
+    private List<ShapeDTO> convertToShapeDTO(List<Shape> shapes) {
+        return shapes.stream()
+                .map(ShapeDTO::new)
+                .collect(Collectors.toList());
+    }
+
     @Override
     public Shape createShapeForCurrentUser(Shape shape, String currentUsername) {
         User user = this.validateUser(currentUsername);
         return this.createShape(shape, user);
     }
 
-    @Override
-    public Shape createShapeForOtherUser(Shape shape) {
-        if (shape == null)
-            throw new ShapeException("Shape cannot be null");
-
-        User user = this.validateUser(shape.getUser().getUsername());
-        return this.createShape(shape, user);
+    private User validateUser(String username){
+        return userRepository.findById(username)
+                .orElseThrow(()->new UserException("User not found for shape"));
     }
 
     private Shape createShape(Shape shape, User user){
@@ -78,16 +80,6 @@ public class ShapeServiceImpl implements ShapeService {
         this.validateShapeRules(shape);
 
         return shapeRepository.save(shape);
-    }
-
-    private ShapeCategory validateShapeCategory(Shape shape){
-        return shapeCategoryRepository.findById(shape.getShapeCategory().getShapeCategoryName())
-                .orElseThrow(()->new ShapeException("Shape category cannot be found"));
-    }
-
-    private User validateUser(String username){
-        return userRepository.findById(username)
-                .orElseThrow(()->new UserException("User not found for shape"));
     }
 
     private void validateShapeSizes(Shape shape) {
@@ -111,10 +103,34 @@ public class ShapeServiceImpl implements ShapeService {
         }
     }
 
-    private List<ShapeDTO> convertToShapeDTO(List<Shape> shapes) {
-        return shapes.stream()
-                .map(ShapeDTO::new)
-                .collect(Collectors.toList());
+    private void evaluateRuleExpression(String expression){
+        if (!(Boolean) this.evaluate(expression)){
+            throw new ShapeException("The shape does not satisfy shape category's requirements. This is wrong "+expression);
+        }
+    }
+
+    private Object evaluate(String expression){
+        try {
+            ScriptEngineManager mgr = new ScriptEngineManager();
+            ScriptEngine engine = mgr.getEngineByName("JavaScript");
+            return engine.eval(expression);
+        } catch (ScriptException e) {
+            throw new ShapeException("Unable to read and evaluate expression: "+expression);
+        }
+    }
+
+    @Override
+    public Shape createShapeForOtherUser(Shape shape) {
+        if (shape == null)
+            throw new ShapeException("Shape cannot be null");
+
+        User user = this.validateUser(shape.getUser().getUsername());
+        return this.createShape(shape, user);
+    }
+
+    private ShapeCategory validateShapeCategory(Shape shape){
+        return shapeCategoryRepository.findById(shape.getShapeCategory().getShapeCategoryName())
+                .orElseThrow(()->new ShapeException("Shape category cannot be found"));
     }
 
     @Override
@@ -170,45 +186,11 @@ public class ShapeServiceImpl implements ShapeService {
     private String convertFormulaToOperations(Map<String, Double> sizes, String[] formulaItems){
         StringBuilder mathOperations = new StringBuilder();
         for (String formulaItem : formulaItems){
-            if (isOperand(formulaItem)){
-                mathOperations.append(sizes.get(formulaItem));
-            } else {
-                mathOperations.append(formulaItem);
-            }
+            mathOperations.append(sizes.get(formulaItem));
         }
 
         return mathOperations.toString();
     }
-
-    private Boolean isOperand(String formulaItem){
-        return !Arrays.asList("*", "-", "+", "/", "(", ")", "=", ">", "<", ">=", "<=").contains(formulaItem) && !this.isNumber(formulaItem);
-    }
-
-    private boolean isNumber(String formulaItem) {
-        try {
-            Double.parseDouble(formulaItem);
-            return true;
-        } catch (NumberFormatException | NullPointerException e) {
-            return false;
-        }
-    }
-
-    private void evaluateRuleExpression(String expression){
-        if (!(Boolean) this.evaluate(expression)){
-            throw new ShapeException("The shape does not satisfy shape category's requirements. This is wrong "+expression);
-        }
-    }
-
-    private Object evaluate(String expression){
-        try {
-            ScriptEngineManager mgr = new ScriptEngineManager();
-            ScriptEngine engine = mgr.getEngineByName("JavaScript");
-            return engine.eval(expression);
-        } catch (ScriptException e) {
-            throw new ShapeException("Unable to read and evaluate expression: "+expression);
-        }
-    }
-
 }
 
 
