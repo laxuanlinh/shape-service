@@ -1,0 +1,58 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="stylesheet" th:href="@{/styles.css}"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css"/>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script type="text/javascript" th:src="@{/category.js}"></script>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+</head>
+<body>
+<div class="container center">
+    <div class="row">
+        <div class="col-sm">
+            <div class="form" id="form">
+                <div class="form-group">
+                    <label for="shapeCategoryName">Category</label>
+                    <input type="text" class="form-control" name="shapeCategoryName" id="shapeCategoryName">
+                </div>
+                <div class="form-group">
+                    <label for="dimensions">Dimensions</label>
+                    <input type="text" class="form-control" name="dimensions" id="dimensions">
+                </div>
+                <div class="form-group">
+                    <label for="formula">Formula</label>
+                    <input type="text" class="form-control" name="formula" id="formula">
+                </div>
+                <div class="form-group">
+                    <label for="rules">Rules</label>
+                    <input type="text" class="form-control" name="rules" id="rules">
+                </div>
+                <button class="btn btn-primary" id="submit">Submit</button>
+            </div>
+        </div>
+        <div class="col-lg">
+            <table class="table">
+                <tr>
+                    <th>Name</th>
+                    <th>Dimensions</th>
+                    <th>Formula</th>
+                    <th>Rules</th>
+                </tr>
+                <tr th:each="category : ${categories}" class="category">
+                    <td th:text="${category.shapeCategoryName}" class="username"></td>
+                    <td>
+                        <th:block th:each="dimension : ${category.dimensions}">
+                            [[${dimension}]]
+                        </th:block>
+                    </td>
+                    <td th:text="${category.formula}" class="role"></td>
+                    <td th:text="${category.rules}"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

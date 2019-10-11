@@ -59,6 +59,13 @@ public class ShapeServiceImpl implements ShapeService {
     }
 
     @Override
+    public List<ShapeDTO> getAllShapesForUser(String username) {
+        List<Shape> shapes = shapeRepository.findAllByUsername(username);
+        return this.convertToShapeDTO(shapes);
+    }
+
+
+    @Override
     public Shape createShapeForCurrentUser(Shape shape, String currentUsername) {
         User user = this.validateUser(currentUsername);
         return this.createShape(shape, user);
@@ -94,12 +101,8 @@ public class ShapeServiceImpl implements ShapeService {
 
     private void validateShapeRules(Shape shape) {
         if (!Strings.isNullOrEmpty(shape.getShapeCategory().getRules())) {
-            String[] rules = shape.getShapeCategory().getRules().split(",");
-            for (String rule : rules){
-                String[] ruleExpressionItems = rule.split(" ");
-                String ruleExpression = this.convertFormulaToOperations(shape.getSizes(), ruleExpressionItems);
-                this.evaluateRuleExpression(ruleExpression);
-            }
+            String ruleExpressionValues = this.convertFormulaToOperations(shape.getSizes(), shape.getShapeCategory().getRules().split(" "));
+            this.evaluateRuleExpression(ruleExpressionValues);
         }
     }
 
@@ -191,6 +194,21 @@ public class ShapeServiceImpl implements ShapeService {
 
         return mathOperations.toString();
     }
+
+    private boolean isNumber(String formulaItem) {
+        try {
+            Double.parseDouble(formulaItem);
+            return true;
+        } catch (NumberFormatException | NullPointerException e) {
+            return false;
+        }
+    }
+
+    @Override
+    public ShapeCategoryDTO createCategory(ShapeCategory shapeCategory) {
+        return new ShapeCategoryDTO(shapeCategoryRepository.save(shapeCategory));
+    }
+
 }
 
 

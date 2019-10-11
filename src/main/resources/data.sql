@@ -1,7 +1,7 @@
-insert into shape_category (shape_category_name, formula, rules) values ('Rectangle', 'width * length','width > 0,length > 0');
+insert into shape_category (shape_category_name, formula, rules) values ('Rectangle', 'width * length','width > 0 && length > 0');
 insert into shape_category (shape_category_name, formula, rules) values  ('Square', 'size * size', 'size > 0');
 insert into shape_category (shape_category_name, formula, rules) values  ('Circle', 'radius * radius * 3.14', 'radius > 0');
-insert into shape_category (shape_category_name, formula, rules) values  ('Oval', 'majorradius * minorradius * 3.14','majorradius > 0,minorradius > 0');
+insert into shape_category (shape_category_name, formula, rules) values  ('Oval', 'majorradius * minorradius * 3.14','majorradius > 0 && minorradius > 0');
 
 insert into dimension (shape_category_name, dimension) values ('Rectangle', 'width');
 insert into dimension (shape_category_name, dimension) values ('Rectangle', 'length');
