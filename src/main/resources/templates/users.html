@@ -1,17 +1,11 @@
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <link rel="stylesheet" th:href="@{/styles.css}"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css"/>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script type="text/javascript" th:src="@{/user.js}"></script>
-    <meta name="_csrf" th:content="${_csrf.token}"/>
-    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
-
-</head>
+<th:block th:insert="fragments/header.html"></th:block>
 <body>
-<div class="container center">
+<div th:insert="fragments/nav.html"/>
+<div class="container">
+    <h1 class="my-4">User management</h1>
     <div class="row">
-        <div class="col-sm">
+        <div class="col-lg-4">
             <div class="form" id="form">
                 <div class="form-group">
                     <label for="username">Username</label>
@@ -29,7 +23,7 @@
                 <button class="btn btn-primary" id="submit">Submit</button>
             </div>
         </div>
-        <div class="col-lg">
+        <div class="col-lg-8">
             <table class="table">
                 <tr>
                     <th>Username</th>
@@ -51,4 +45,9 @@
     </div>
 </div>
 </body>
+<footer>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script type="text/javascript" th:src="@{/user.js}"></script>
+</footer>
 </html>

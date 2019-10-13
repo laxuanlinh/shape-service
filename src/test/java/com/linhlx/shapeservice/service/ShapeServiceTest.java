@@ -17,8 +17,6 @@ import org.assertj.core.util.Sets;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import java.util.*;
 
 import static org.junit.Assert.*;
@@ -32,6 +30,9 @@ public class ShapeServiceTest {
     private ShapeRepository shapeRepository;
     private List<ShapeDTO> shapeDTOS;
     private Shape shape;
+    private Shape shape1;
+    private Shape shape2;
+    private List<Shape> shapes;
     private Shape createdShape;
     private ShapeCategory rectangleShapeCategory;
     private ShapeCategory circleShapeCategory;
@@ -40,6 +41,7 @@ public class ShapeServiceTest {
     private AreaDTO areaDTO;
     private User user;
     private ShapeCategoryDTO shapeCategoryDTO;
+    private List<String> otherCategories;
 
     @Before
     public void setUp(){
@@ -50,35 +52,45 @@ public class ShapeServiceTest {
 
         user = new User("username", "password", true, new Role());
 
-        Shape shape1 = new Shape(1l, "test shape1", Maps.newHashMap(), new ShapeCategory(), user);
-        Shape shape2 = new Shape(2l, "test shape2", Maps.newHashMap(), new ShapeCategory(), user);
-        List<Shape> shapes = Lists.newArrayList(shape1, shape2);
-        when(shapeRepository.findAll()).thenReturn(shapes);
+        setUpShapeCategory();
+        setUpShapes();
+        setUpWhen();
 
-        rectangleShapeCategory = new ShapeCategory();
-        rectangleShapeCategory.setShapeCategoryName("Rectangle");
-        rectangleShapeCategory.setDimensions(Sets.newHashSet(Arrays.asList("width", "length")));
-        rectangleShapeCategory.setFormula("width * length");
-        rectangleShapeCategory.setRules("width > 0,length > 0");
-        when(shapeCategoryRepository.findById(anyString())).thenReturn(Optional.of(rectangleShapeCategory));
+    }
+
+    private void setUpShapes(){
+        shape1 = new Shape(1l, "test shape1", Maps.newHashMap(), new ShapeCategory(), user, true);
+        shape2 = new Shape(2l, "test shape2", Maps.newHashMap(), new ShapeCategory(), user, true);
+        shapes = Lists.newArrayList(shape1, shape2);
 
         Map<String, Double> sizes = Maps.newHashMap();
         sizes.put("width", 100.0);
         sizes.put("length", 200.0);
-        shape = new Shape(1l, "created shape", sizes, rectangleShapeCategory, user);
-        when(shapeRepository.save(shape)).thenReturn(shape);
+        shape = new Shape(1l, "created shape", sizes, rectangleShapeCategory, user, true);
+    }
 
-        ShapeCategory shapeCategory1 = new ShapeCategory();
-        shapeCategory1.setShapeCategoryName("Rectangle");
-        ShapeCategory shapeCategory2 = new ShapeCategory();
-        shapeCategory2.setShapeCategoryName("Circle");
-        when(shapeCategoryRepository.findAll()).thenReturn(Lists.newArrayList(shapeCategory1, shapeCategory2));
+    private void setUpShapeCategory(){
+        rectangleShapeCategory = new ShapeCategory();
+        rectangleShapeCategory.setShapeCategoryName("Rectangle");
+        rectangleShapeCategory.setDimensions(Sets.newHashSet(Arrays.asList("width", "length")));
+        rectangleShapeCategory.setFormula("width * length");
+        rectangleShapeCategory.setRules("width > 0 && length > 0");
+        Map<String,String> conditions = Maps.newHashMap();
+        conditions.put("Square", "width == length");
+        rectangleShapeCategory.setConditionsOtherCategories(conditions);
 
         circleShapeCategory = new ShapeCategory();
         circleShapeCategory.setShapeCategoryName("Rectangle");
         circleShapeCategory.setDimensions(Sets.newHashSet(Arrays.asList("radius")));
         circleShapeCategory.setFormula("radius * radius * 3.14");
         circleShapeCategory.setRules("radius > 0");
+    }
+
+    private void setUpWhen(){
+        when(shapeRepository.findAll()).thenReturn(shapes);
+        when(shapeCategoryRepository.findById(anyString())).thenReturn(Optional.of(rectangleShapeCategory));
+        when(shapeRepository.save(shape)).thenReturn(shape);
+        when(shapeCategoryRepository.findAll()).thenReturn(Lists.newArrayList(rectangleShapeCategory, circleShapeCategory));
         when(shapeCategoryRepository.getShapeCategoryByDimensions(anySet())).thenReturn(Lists.newArrayList(circleShapeCategory));
         when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
         when(shapeRepository.findAllByUsername(anyString())).thenReturn(shapes);
@@ -195,10 +207,32 @@ public class ShapeServiceTest {
         shouldReturnCategoryDTO();
     }
 
+    @Test
+    public void shouldGetOtherCategories(){
+        givenRectangleWithEvenWidthAndLength();
+        whenGetOtherCategories();
+        shouldReturnOtherCategories();
+    }
+
+    private void shouldReturnOtherCategories() {
+        assertEquals("Square", otherCategories.get(0));
+    }
+
+    private void whenGetOtherCategories() {
+        otherCategories = shapeService.getOtherCategories(shape);
+    }
+
+    private void givenRectangleWithEvenWidthAndLength() {
+        Map<String, Double> sizes = Maps.newHashMap();
+        sizes.put("width", 100.0);
+        sizes.put("length", 100.0);
+        shape.setSizes(sizes);
+    }
+
     private void shouldReturnCategoryDTO() {
         assertEquals("Rectangle", shapeCategoryDTO.getShapeCategoryName());
         assertEquals("width * length", shapeCategoryDTO.getFormula());
-        assertEquals("width > 0,length > 0", shapeCategoryDTO.getRules());
+        assertEquals("width > 0 && length > 0", shapeCategoryDTO.getRules());
     }
 
     private void whenCreateCategory() {
@@ -206,11 +240,11 @@ public class ShapeServiceTest {
     }
 
     private void whenCreateShapeWithCurrentUser() {
-        createdShape = shapeService.createShapeForCurrentUser(shape, "username");
+        createdShape = shapeService.saveShape(shape);
     }
 
     private void whenCreateShapeForOtherUser() {
-        createdShape = shapeService.createShapeForOtherUser(shape);
+        createdShape = shapeService.saveShape(shape);
     }
 
     private void butRulesInvalid() {
@@ -264,7 +298,7 @@ public class ShapeServiceTest {
         sizes.put("width", 100.0);
         sizes.put("length", 200.0);
         sizes.put("radius", 90.0);
-        shape = new Shape(1l, "created shape", sizes, rectangleShapeCategory, user);
+        shape = new Shape(1l, "created shape", sizes, rectangleShapeCategory, user, true);
     }
 
     private void givenShapeIsNull() {
@@ -278,12 +312,12 @@ public class ShapeServiceTest {
     private void givenShapeWithOnlyLength() {
         Map<String, Double> sizes = Maps.newHashMap();
         sizes.put("length", 200.0);
-        shape = new Shape(1l, "created shape", sizes, rectangleShapeCategory, user);
+        shape = new Shape(1l, "created shape", sizes, rectangleShapeCategory, user, true);
         when(shapeRepository.save(shape)).thenReturn(shape);
     }
 
     private void whenCreateShape() {
-        createdShape = shapeService.createShapeForOtherUser(shape);
+        createdShape = shapeService.saveShape(shape);
     }
 
     private void givenShapeWithNoUsername() {

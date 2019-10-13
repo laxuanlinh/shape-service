@@ -3,7 +3,6 @@ package com.linhlx.shapeservice.controller;
 import com.linhlx.shapeservice.dto.AreaDTO;
 import com.linhlx.shapeservice.model.Shape;
 import com.linhlx.shapeservice.service.ShapeService;
-import org.assertj.core.util.Lists;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
@@ -11,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.security.Principal;
 
+import static org.assertj.core.util.Lists.newArrayList;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -27,10 +27,11 @@ public class ShapeRestControllerTest {
         shapeRestController = new ShapeRestController(shapeService);
         principal = mock(Principal.class);
 
-        when(shapeService.getAllShapes()).thenReturn(Lists.newArrayList());
-        when(shapeService.getAllShapeCategories()).thenReturn(Lists.newArrayList());
+        when(shapeService.getAllShapes()).thenReturn(newArrayList());
+        when(shapeService.getAllShapeCategories()).thenReturn(newArrayList());
         when(shapeService.getArea(any())).thenReturn(new AreaDTO());
-        when(shapeService.createShapeForCurrentUser(any(), any())).thenReturn(new Shape());
+        when(shapeService.saveShape(any())).thenReturn(new Shape());
+        when(shapeService.getOtherCategories(any())).thenReturn(newArrayList());
     }
 
     @Test
@@ -55,6 +56,16 @@ public class ShapeRestControllerTest {
     public void shouldReturnOKWhenCalculateArea(){
         whenCalculateArea();
         shouldReturnResponseEntity();
+    }
+
+    @Test
+    public void shouldReturnOKWhenGetOtherCategories(){
+        whenGetOtherCategories();
+        shouldReturnResponseEntity();
+    }
+
+    private void whenGetOtherCategories() {
+        entity = shapeRestController.getOtherCategories(new Shape());
     }
 
     private void whenCreateShape() {

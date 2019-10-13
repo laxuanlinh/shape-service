@@ -2,7 +2,6 @@ package com.linhlx.shapeservice.model;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "authorities")
@@ -13,8 +12,7 @@ public class Role {
     private Long id;
     @NotEmpty(message = "Role cannot be empty")
     private String authority;
-    @NotNull(message = "Username cannot be empty")
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "username")
     private User user;
 

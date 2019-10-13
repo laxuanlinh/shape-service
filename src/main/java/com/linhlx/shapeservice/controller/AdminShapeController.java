@@ -8,12 +8,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import java.security.Principal;
-import java.util.List;
+import javax.websocket.server.PathParam;
 
 @Controller
 @RequestMapping("/admin/shapes")
@@ -39,8 +39,20 @@ public class AdminShapeController {
 
     @RequestMapping(value = "", method = RequestMethod.POST)
     public ResponseEntity<Long> createShape(@RequestBody Shape shape){
-        Shape createdShape = shapeService.createShapeForOtherUser(shape);
+        Shape createdShape = shapeService.saveShape(shape);
         return new ResponseEntity<>(createdShape.getId(), HttpStatus.CREATED);
+    }
+
+    @RequestMapping(value = "", method = RequestMethod.PUT)
+    public ResponseEntity<Long> updateShape(@RequestBody Shape shape){
+        Shape updatedShape = shapeService.saveShape(shape);
+        return new ResponseEntity<>(updatedShape.getId(), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity<Long> deleteShape(@PathVariable("id") Long id){
+        Long deletedId = shapeService.deleteShape(id);
+        return new ResponseEntity<>(id, HttpStatus.OK);
     }
 
 }

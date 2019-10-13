@@ -1,37 +1,71 @@
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <link rel="stylesheet" th:href="@{/styles.css}"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css"/>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script type="text/javascript" th:src="@{/category.js}"></script>
-    <meta name="_csrf" th:content="${_csrf.token}"/>
-    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
-
-</head>
+<th:block th:insert="fragments/header.html"></th:block>
 <body>
-<div class="container center">
-    <div class="row">
-        <div class="col-sm">
-            <div class="form" id="form">
-                <div class="form-group">
-                    <label for="shapeCategoryName">Category</label>
-                    <input type="text" class="form-control" name="shapeCategoryName" id="shapeCategoryName">
+<div th:insert="fragments/nav.html"/>
+<div class="container">
+    <h1 class="my-4">
+        Category management
+        <button type="button" class="btn btn-primary" data-toggle="modal" href="#exampleModal">
+            Create category
+        </button>
+    </h1>
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Modal title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
-                <div class="form-group">
-                    <label for="dimensions">Dimensions</label>
-                    <input type="text" class="form-control" name="dimensions" id="dimensions">
+                <div class="modal-body">
+                    <div class="form" id="form">
+                        <div class="form-group">
+                            <label for="shapeCategoryName">Category</label>
+                            <input type="text" class="form-control" name="shapeCategoryName" id="shapeCategoryName">
+                        </div>
+                        <div class="form-group">
+                            <label for="dimensions">Dimensions</label>
+                            <input type="text" class="form-control" name="dimensions" id="dimensions">
+                        </div>
+                        <div class="form-group">
+                            <label for="formula">Formula</label>
+                            <input type="text" class="form-control" name="formula" id="formula">
+                        </div>
+                        <div class="form-group">
+                            <label for="rules">Rules</label>
+                            <input type="text" class="form-control" name="rules" id="rules">
+                        </div>
+                        <div class="form-group">
+                            <label for="otherCategoryName">Other category</label>
+                            <select name="otherCategoryName" id="otherCategoryName" class="form-control">
+                                <option th:each="category : ${categories}"
+                                        th:value="${category.shapeCategoryName}"
+                                        th:utext="${category.shapeCategoryName}"></option>
+                            </select>
+
+                        </div>
+                        <div class="form-group" id="conditionsGroup">
+                            <label for="rules">Conditions</label>
+                            <div class="row">
+                                <div class="col-lg-8">
+                                    <input type="text" class="form-control" name="rules" id="conditions">
+                                </div>
+                                <div class="col-lg-4">
+                                    <button class="form-control" id="addConditions">Add</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="formula">Formula</label>
-                    <input type="text" class="form-control" name="formula" id="formula">
+                <div class="modal-footer">
+                    <button class="btn btn-primary center" id="submit">Submit</button>
                 </div>
-                <div class="form-group">
-                    <label for="rules">Rules</label>
-                    <input type="text" class="form-control" name="rules" id="rules">
-                </div>
-                <button class="btn btn-primary" id="submit">Submit</button>
             </div>
         </div>
+    </div>
+    <div class="row">
         <div class="col-lg">
             <table class="table">
                 <tr>
@@ -39,20 +73,31 @@
                     <th>Dimensions</th>
                     <th>Formula</th>
                     <th>Rules</th>
+                    <th>Conditions to fall under other categories</th>
                 </tr>
                 <tr th:each="category : ${categories}" class="category">
                     <td th:text="${category.shapeCategoryName}" class="username"></td>
                     <td>
                         <th:block th:each="dimension : ${category.dimensions}">
-                            [[${dimension}]]
+                            [[${dimension}]]<br>
                         </th:block>
                     </td>
                     <td th:text="${category.formula}" class="role"></td>
                     <td th:text="${category.rules}"></td>
+                    <td>
+                        <div th:each="condition : ${category.conditionsOtherCategories}">
+                            <b th:text="${condition.key}"></b> when <i th:text="${condition.value}"></i>;
+                        </div>
+                    </td>
                 </tr>
             </table>
         </div>
     </div>
 </div>
 </body>
+<footer>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script type="text/javascript" th:src="@{/category.js}"></script>
+</footer>
 </html>

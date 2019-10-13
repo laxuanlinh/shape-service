@@ -14,10 +14,13 @@ public interface ShapeService {
 
     List<ShapeDTO> getAllShapes();
     List<ShapeDTO> getAllShapesForUser(String username);
-    Shape createShapeForCurrentUser(Shape shape, String username);
-    Shape createShapeForOtherUser(Shape shape);
-    List<ShapeCategoryDTO> getAllShapeCategories();
+    Shape saveShape(Shape shape);
     AreaDTO getArea(Shape shape);
+//    Shape updateShape(Shape updateInfo);
+    Long deleteShape(Long id);
+
+    List<ShapeCategoryDTO> getAllShapeCategories();
+    List<String> getOtherCategories(Shape editedShape);
     ShapeCategoryDTO createCategory(ShapeCategory shapeCategory);
 
 }

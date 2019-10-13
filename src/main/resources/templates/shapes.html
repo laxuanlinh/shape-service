@@ -1,16 +1,9 @@
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <link rel="stylesheet" th:href="@{/styles.css}"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css"/>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.1/jquery.validate.min.js"></script>
-    <script type="text/javascript" th:src="@{/shape.js}"></script>
-    <meta name="_csrf" th:content="${_csrf.token}"/>
-    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
-
-</head>
+<th:block th:insert="fragments/header.html"></th:block>
 <body>
-<div class="container center">
+<div th:insert="fragments/nav.html"/>
+<div class="container">
+    <h1 class="my-4">Your shapes</h1>
     <div class="row">
         <div class="col-lg">
             <table class="table">
@@ -33,4 +26,9 @@
     </div>
 </div>
 </body>
+<footer>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script type="text/javascript" th:src="@{/shape.js}"></script>
+</footer>
 </html>

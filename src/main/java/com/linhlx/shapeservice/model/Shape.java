@@ -33,15 +33,18 @@ public class Shape {
     @NotNull(message = "Creator cannot be null")
     private User user;
 
+    private Boolean enabled;
+
     public Shape() {
     }
 
-    public Shape(Long id, String shapeName, Map<String, Double> sizes, ShapeCategory shapeCategory, User user) {
+    public Shape(Long id, String shapeName, Map<String, Double> sizes, ShapeCategory shapeCategory, User user, Boolean enabled) {
         this.id = id;
         this.shapeName = shapeName;
         this.sizes = sizes;
         this.shapeCategory = shapeCategory;
         this.user = user;
+        this.enabled = enabled;
     }
 
     public Long getId() {
@@ -82,5 +85,13 @@ public class Shape {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 }

@@ -45,38 +45,29 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO createUser(PostedUserDTO postedUserDTO) {
-        User user = this.saveUser(postedUserDTO);
-        Role role = this.saveRole(postedUserDTO.getRole(), user);
-        return this.convertToUserDTO(user, role);
-    }
-
-    private User saveUser(PostedUserDTO postedUserDTO){
+        if (userRepository.findById(postedUserDTO.getUsername()).isPresent()){
+            throw new UserException("Username already exists");
+        }
         User user = new User(postedUserDTO.getUsername(), encoder.encode(postedUserDTO.getPassword()), true, null);
-        return userRepository.save(user);
-    }
-
-    private Role saveRole(String role, User user){
-        return roleRepository.save(new Role(role, user));
-    }
-
-    private UserDTO convertToUserDTO(User user, Role role){
+        Role role = new Role(postedUserDTO.getRole(), user);
         user.setRole(role);
-        return new UserDTO(user);
+
+        return saveUser(user);
     }
 
     @Override
     public UserDTO updateUser(PostedUserDTO postedUserDTO) {
         User user = userRepository.findById(postedUserDTO.getUsername())
                 .orElseThrow(()->new UserException("User not found"));
-        Role role = roleRepository.findByUsername(postedUserDTO.getUsername())
-                .orElseThrow(()->new UserException("Role not found"));
         if (Strings.isNotEmpty(postedUserDTO.getPassword()))
             user.setPassword(encoder.encode(postedUserDTO.getPassword()));
         if (Strings.isNotEmpty(postedUserDTO.getRole()))
-            role.setAuthority(postedUserDTO.getRole());
-        userRepository.save(user);
-        roleRepository.save(role);
-        user.setRole(role);
+            user.getRole().setAuthority(postedUserDTO.getRole());
+        return saveUser(user);
+    }
+
+    private UserDTO saveUser(User user){
+        user = userRepository.save(user);
 
         return new UserDTO(user);
     }

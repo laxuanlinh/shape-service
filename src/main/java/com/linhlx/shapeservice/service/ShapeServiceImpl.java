@@ -1,6 +1,7 @@
 package com.linhlx.shapeservice.service;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.linhlx.shapeservice.dto.AreaDTO;
 import com.linhlx.shapeservice.dto.ShapeCategoryDTO;
@@ -14,26 +15,20 @@ import com.linhlx.shapeservice.repository.ShapeCategoryRepository;
 import com.linhlx.shapeservice.repository.ShapeRepository;
 import com.linhlx.shapeservice.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-import java.security.Principal;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
 @Transactional
 public class ShapeServiceImpl implements ShapeService {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ShapeServiceImpl.class);
 
     private final ShapeCategoryRepository shapeCategoryRepository;
     private final ShapeRepository shapeRepository;
@@ -52,6 +47,12 @@ public class ShapeServiceImpl implements ShapeService {
         return this.convertToShapeDTO(shapes);
     }
 
+    @Override
+    public List<ShapeDTO> getAllShapesForUser(String username) {
+        List<Shape> shapes = shapeRepository.findAllByUsername(username);
+        return this.convertToShapeDTO(shapes);
+    }
+
     private List<ShapeDTO> convertToShapeDTO(List<Shape> shapes) {
         return shapes.stream()
                 .map(ShapeDTO::new)
@@ -59,29 +60,13 @@ public class ShapeServiceImpl implements ShapeService {
     }
 
     @Override
-    public List<ShapeDTO> getAllShapesForUser(String username) {
-        List<Shape> shapes = shapeRepository.findAllByUsername(username);
-        return this.convertToShapeDTO(shapes);
-    }
-
-
-    @Override
-    public Shape createShapeForCurrentUser(Shape shape, String currentUsername) {
-        User user = this.validateUser(currentUsername);
-        return this.createShape(shape, user);
-    }
-
-    private User validateUser(String username){
-        return userRepository.findById(username)
-                .orElseThrow(()->new UserException("User not found for shape"));
-    }
-
-    private Shape createShape(Shape shape, User user){
+    public Shape saveShape(Shape shape) {
         if (shape == null)
             throw new ShapeException("Shape cannot be null");
-
-        ShapeCategory shapeCategory = this.validateShapeCategory(shape);
+        shape.setEnabled(true);
+        ShapeCategory shapeCategory = this.getShapeCategory(shape.getShapeCategory().getShapeCategoryName());
         shape.setShapeCategory(shapeCategory);
+        User user = this.getUser(shape.getUser().getUsername());
         shape.setUser(user);
         this.validateShapeSizes(shape);
         this.validateShapeRules(shape);
@@ -89,19 +74,46 @@ public class ShapeServiceImpl implements ShapeService {
         return shapeRepository.save(shape);
     }
 
+    private ShapeCategory getShapeCategory(String shapeCategoryName){
+        return shapeCategoryRepository.findById(shapeCategoryName)
+                .orElseThrow(()->new ShapeException("Shape category cannot be found"));
+    }
+
+    private User getUser(String username){
+        return userRepository.findById(username)
+                .orElseThrow(()->new UserException("User not found for shape"));
+    }
+
+    private Shape getShape(Long id){
+        return shapeRepository.findById(id)
+                .orElseThrow(()->new ShapeException("Shape not found"));
+    }
+
+    @Override
+    public Long deleteShape(Long id) {
+        Shape shape = this.getShape(id);
+        shape.setEnabled(false);
+        shapeRepository.save(shape);
+        return id;
+    }
+
     private void validateShapeSizes(Shape shape) {
         for (String dimension : shape.getShapeCategory().getDimensions()) {
-            if (!shape.getSizes().containsKey(dimension))
-                throw new ShapeException("Shape " + shape.getShapeName() + " does not have " + dimension);
+            this.checkIfShapeHasDimension(shape, dimension);
         }
         if (shape.getSizes().size() > shape.getShapeCategory().getDimensions().size())
             throw new ShapeException("Shape " + shape.getShapeName() + " cannot have more dimensions than category");
     }
 
+    private void checkIfShapeHasDimension(Shape shape, String dimensionName){
+        if (!shape.getSizes().containsKey(dimensionName))
+            throw new ShapeException("Shape " + shape.getShapeName() + " does not have " + dimensionName);
+    }
 
     private void validateShapeRules(Shape shape) {
         if (!Strings.isNullOrEmpty(shape.getShapeCategory().getRules())) {
-            String ruleExpressionValues = this.convertFormulaToOperations(shape.getSizes(), shape.getShapeCategory().getRules().split(" "));
+            String[] ruleTermArr = shape.getShapeCategory().getRules().split(" ");
+            String ruleExpressionValues = this.replaceTermsWithValues(shape.getSizes(), ruleTermArr);
             this.evaluateRuleExpression(ruleExpressionValues);
         }
     }
@@ -120,20 +132,6 @@ public class ShapeServiceImpl implements ShapeService {
         } catch (ScriptException e) {
             throw new ShapeException("Unable to read and evaluate expression: "+expression);
         }
-    }
-
-    @Override
-    public Shape createShapeForOtherUser(Shape shape) {
-        if (shape == null)
-            throw new ShapeException("Shape cannot be null");
-
-        User user = this.validateUser(shape.getUser().getUsername());
-        return this.createShape(shape, user);
-    }
-
-    private ShapeCategory validateShapeCategory(Shape shape){
-        return shapeCategoryRepository.findById(shape.getShapeCategory().getShapeCategoryName())
-                .orElseThrow(()->new ShapeException("Shape category cannot be found"));
     }
 
     @Override
@@ -181,27 +179,24 @@ public class ShapeServiceImpl implements ShapeService {
     }
 
     private Double calculateArea(Map<String, Double> sizes, String formula){
-        String[] formulaItems = formula.split(" ");
-        String mathOperations = this.convertFormulaToOperations(sizes, formulaItems);
+        String[] formulaTerms = formula.split(" ");
+        String mathOperations = this.replaceTermsWithValues(sizes, formulaTerms);
         return (Double) evaluate(mathOperations);
     }
 
-    private String convertFormulaToOperations(Map<String, Double> sizes, String[] formulaItems){
-        StringBuilder mathOperations = new StringBuilder();
-        for (String formulaItem : formulaItems){
-            mathOperations.append(sizes.get(formulaItem));
+    private String replaceTermsWithValues(Map<String, Double> sizes, String[] formulaTerms){
+        StringBuilder mathExpression = new StringBuilder();
+        for (String formulaTerm : formulaTerms){
+            mathExpression.append(this.getValueWithTerm(sizes, formulaTerm));
         }
-
-        return mathOperations.toString();
+        return mathExpression.toString();
     }
 
-    private boolean isNumber(String formulaItem) {
-        try {
-            Double.parseDouble(formulaItem);
-            return true;
-        } catch (NumberFormatException | NullPointerException e) {
-            return false;
-        }
+    private String getValueWithTerm(Map<String, Double> sizes, String formulaTerm){
+        if (sizes.containsKey(formulaTerm))
+            return String.valueOf(sizes.get(formulaTerm));
+        else
+            return formulaTerm;
     }
 
     @Override
@@ -209,6 +204,33 @@ public class ShapeServiceImpl implements ShapeService {
         return new ShapeCategoryDTO(shapeCategoryRepository.save(shapeCategory));
     }
 
+    @Override
+    public List<String> getOtherCategories(Shape shape) {
+        ShapeCategory shapeCategory = this.getShapeCategory(shape.getShapeCategory().getShapeCategoryName());
+        shape.setShapeCategory(shapeCategory);
+        this.validateShapeRules(shape);
+        return this.validateShapeConditions(shape);
+    }
+
+    private List<String> validateShapeConditions(Shape shape) {
+        List<String> otherCategories = Lists.newArrayList();
+        if (shape.getShapeCategory() != null) {
+            this.addSatisfiedCategories(shape, otherCategories);
+        }
+
+        return otherCategories;
+    }
+
+    private void addSatisfiedCategories(Shape shape, List<String> otherCategories){
+        Set<Map.Entry<String, String>> conditionSet = shape.getShapeCategory().getConditionsOtherCategories().entrySet();
+
+        for (Map.Entry<String, String> condition : conditionSet){
+            String conditionWithValues = this.replaceTermsWithValues(shape.getSizes(), condition.getValue().split(" "));
+            if ((Boolean) this.evaluate(conditionWithValues)){
+                otherCategories.add(condition.getKey());
+            }
+        }
+    }
 }
 
 

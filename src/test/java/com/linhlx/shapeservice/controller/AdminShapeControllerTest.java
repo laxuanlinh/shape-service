@@ -37,7 +37,7 @@ public class AdminShapeControllerTest {
         when(shapeService.getAllShapes()).thenReturn(newArrayList());
         Shape createdShape = new Shape();
         createdShape.setId(1l);
-        when(shapeService.createShapeForOtherUser(any())).thenReturn(createdShape);
+        when(shapeService.saveShape(any())).thenReturn(createdShape);
     }
 
     @Test

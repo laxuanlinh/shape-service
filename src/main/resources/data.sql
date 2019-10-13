@@ -16,8 +16,10 @@ insert into authorities(id, username, authority) values (1,'laxuanlinh', 'ROLE_A
 insert into users(username, password, enabled) values ('laxuanlinh2', '$2a$10$HnfRIDTI7y.hlPisMfXeFuGHkqLaD/95bS4ICCROdFqO4KkzRK3yi', true);
 insert into authorities(id, username, authority) values (2,'laxuanlinh2', 'ROLE_USER');
 
-insert into shape (shape_id, shape_name, shape_category_name, username) values (1, 'my rectangle', 'Rectangle','laxuanlinh');
+insert into shape (shape_id, shape_name, shape_category_name, username, enabled) values (1, 'my rectangle', 'Rectangle','laxuanlinh', true  );
 
 
 insert into size(shape_id, name, size) values (1, 'width', 10);
 insert into size(shape_id, name, size) values (1, 'length', 10);
+
+insert into conditions_other_categories(shape_category_name, conditions, other_category_name) values ('Rectangle', 'width == length', 'Square');

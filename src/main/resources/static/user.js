@@ -3,12 +3,16 @@ $(function() {
     var header = $("meta[name='_csrf_header']").attr("content");
     var edit = false;
 
-    $("#submit").click(function(){
+    $(document).on("click", "#submit", function(){
+    console.log("submitting");
         var username = $("#username").val();
         var password = $("#password").val();
         var role = $("#role").val();
         var postedUserDTO = { username: username, password: password, role: role };
-
+        if(!formIsValid()){
+            return;
+        }
+        console.log("something here");
         if(edit){
             editUser(postedUserDTO);
         } else {
@@ -17,8 +21,9 @@ $(function() {
     });
 
     function createUser(postedUserDTO){
+        console.log("creating");
         $.ajax({
-            url: "/users",
+            url: "/admin/users",
             method: "POST",
             dataType: "json",
             contentType: "application/json;charset=utf-8",
@@ -27,21 +32,34 @@ $(function() {
                 xhr.setRequestHeader(header, token);
             },
             success: function(result){
-                console.log(result);
-                edit = false;
-                $("#username").val("");
-                $("#role").val("");
-                $("#password").val("");
+                location.reload(true);
             },
-            error: function(){
-                console.log("Error");
+            error: function(e){
+                alert(e.responseJSON.message);
             }
         })
     }
 
+    function formIsValid(){
+        if(!$("#username").val() || $("#username").val().trim()===""){
+            alert("Username is required");
+            return false;
+        }
+        if(!$("#password").val() || $("#password").val().trim()===""){
+            alert("Password is required");
+            return false;
+        }
+        if(!$("#role").val() || $("#role").val().trim()===""){
+            alert("Role is required");
+            return false;
+        }
+
+        return true;
+    }
+
     function editUser(postedUserDTO){
         $.ajax({
-            url: "/users",
+            url: "/admin/users",
             method: "PUT",
             dataType: "json",
             contentType: "application/json;charset=utf-8",
@@ -50,14 +68,10 @@ $(function() {
                 xhr.setRequestHeader(header, token);
             },
             success: function(result){
-                console.log(result);
-                edit = false;
-                $("#username").val("");
-                $("#role").val("");
-                $("#password").val("");
+                location.reload(true);
             },
-            error: function(){
-                console.log("Error");
+            error: function(e){
+                alert(e.responseJSON.message);
             }
         })
     }
@@ -77,7 +91,7 @@ $(function() {
         var username = element.find(".username").text();
 
         $.ajax({
-            url: "/users/"+username,
+            url: "/admin/users/"+username,
             method: "DELETE",
             dataType: "json",
             contentType: "application/json;charset=utf-8",
@@ -85,10 +99,10 @@ $(function() {
                 xhr.setRequestHeader(header, token);
             },
             success: function(result){
-                element.hide();
+                location.reload(true);
             },
-            error: function(){
-                console.log("Error");
+            error: function(e){
+                alert(e.responseJSON.message);
             }
         })
     })

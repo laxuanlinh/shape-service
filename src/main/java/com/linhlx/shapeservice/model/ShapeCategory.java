@@ -4,6 +4,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Entity
@@ -27,15 +28,22 @@ public class ShapeCategory {
 
     private String rules;
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @MapKeyColumn(name="other_category_name")
+    @Column(name = "conditions")
+    @CollectionTable(name = "conditions_other_categories", joinColumns = @JoinColumn(name = "shape_category_name"))
+    private Map<String, String> conditionsOtherCategories;
+
     public ShapeCategory() {
     }
 
-    public ShapeCategory(String shapeCategoryName, Set<String> dimensions, List<Shape> shapes, String formula, String rules) {
+    public ShapeCategory(String shapeCategoryName, Set<String> dimensions, List<Shape> shapes, String formula, String rules, Map<String, String> conditionsOtherCategories) {
         this.shapeCategoryName = shapeCategoryName;
         this.dimensions = dimensions;
         this.shapes = shapes;
         this.formula = formula;
         this.rules = rules;
+        this.conditionsOtherCategories = conditionsOtherCategories;
     }
 
     public String getShapeCategoryName() {
@@ -76,5 +84,13 @@ public class ShapeCategory {
 
     public void setRules(String rules) {
         this.rules = rules;
+    }
+
+    public Map<String, String> getConditionsOtherCategories() {
+        return conditionsOtherCategories;
+    }
+
+    public void setConditionsOtherCategories(Map<String, String> conditionsOtherCategories) {
+        this.conditionsOtherCategories = conditionsOtherCategories;
     }
 }
