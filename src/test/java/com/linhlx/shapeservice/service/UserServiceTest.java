@@ -1,6 +1,6 @@
 package com.linhlx.shapeservice.service;
 
-import com.linhlx.shapeservice.dto.PostedUserDTO;
+import com.linhlx.shapeservice.dto.UserDetailsDTO;
 import com.linhlx.shapeservice.dto.UserDTO;
 import com.linhlx.shapeservice.exception.UserException;
 import com.linhlx.shapeservice.model.Role;
@@ -25,9 +25,10 @@ public class UserServiceTest {
     private UserRepository userRepository;
     private RoleRepository roleRepository;
     private PasswordEncoder passwordEncoder;
-    private List<UserDTO> userDTOs;
+    private List<UserDTO> userDTOS;
     private UserDTO userDTO;
-    private PostedUserDTO postedUserDTO;
+    private List<UserDetailsDTO> userDetailsDTOS;
+    private UserDetailsDTO userDetailsDTO;
     private User user1;
     private User user2;
     private Role roleUser;
@@ -70,14 +71,14 @@ public class UserServiceTest {
 
     @Test
     public void shouldCreateUser(){
-        givenPostedUserDTO();
+        givenUserDetailsDTO();
         whenCreateUser();
         shouldReturnUserDTO();
     }
 
     @Test
     public void shouldEditUser(){
-        givenPostedUserDTOWithRoleADMIN();
+        givenUserDetailsDTOWithRoleADMIN();
         whenUpdateUser();
         shouldReturnUserDTOWithRleADMIN();
     }
@@ -90,14 +91,14 @@ public class UserServiceTest {
 
     @Test(expected = UserException.class)
     public void shouldThrowExceptionWhenUserNotFoundWhenUpdate(){
-        givenPostedUserDTO();
+        givenUserDetailsDTO();
         givenUserCannotBeFound();
         whenUpdateUser();
     }
 
     @Test(expected = UserException.class)
     public void shouldThrowExceptionWhenRoleNotFoundWhenUpdate(){
-        givenPostedUserDTO();
+        givenUserDetailsDTO();
         givenUserCannotBeFound();
         whenUpdateUser();
     }
@@ -130,21 +131,22 @@ public class UserServiceTest {
         assertTrue(userDTO.getEnabled());
     }
 
-    private void givenPostedUserDTOWithRoleADMIN() {
-        postedUserDTO = new PostedUserDTO("users-1", "password", "ROLE_ADMIN");
+    private void givenUserDetailsDTOWithRoleADMIN() {
+        userDetailsDTO = new UserDetailsDTO("users-1", "password", "ROLE_ADMIN", true);
         when(roleRepository.save(any())).thenReturn(roleAdmin);
     }
 
     private void whenUpdateUser() {
-        userDTO = userService.updateUser(postedUserDTO);
+        userDTO = userService.updateUser(userDetailsDTO);
     }
 
-    private void givenPostedUserDTO() {
-        postedUserDTO = new PostedUserDTO("users-1", "password", "ROLE_USER");
+    private void givenUserDetailsDTO() {
+        userDetailsDTO = new UserDetailsDTO("users-1", "password", "ROLE_USER", true);
     }
 
     private void whenCreateUser() {
-        userDTO = userService.createUser(postedUserDTO);
+        when(userRepository.findById(any())).thenReturn(empty());
+        userDTO = userService.createUser(userDetailsDTO);
     }
 
     private void shouldReturnUserDTO() {
@@ -154,11 +156,11 @@ public class UserServiceTest {
     }
 
     private void shouldReturnUserDTOs() {
-        assertEquals(2, userDTOs.size());
+        assertEquals(2, userDTOS.size());
     }
 
     private void whenGetAllUsers() {
-        userDTOs = userService.getAllUsers();
+        userDTOS = userService.getAllUsers();
     }
 
 

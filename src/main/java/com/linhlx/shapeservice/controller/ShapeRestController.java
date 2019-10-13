@@ -31,7 +31,7 @@ public class ShapeRestController {
     }
 
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public ResponseEntity<Long> saveShape(@RequestBody Shape shape, Principal currentUser){
+    public ResponseEntity<Long> createShape(@RequestBody Shape shape, Principal currentUser){
         User user = new User();
         user.setUsername(currentUser.getName());
         shape.setUser(user);

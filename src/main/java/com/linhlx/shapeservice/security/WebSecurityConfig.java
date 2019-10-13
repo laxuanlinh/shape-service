@@ -3,11 +3,12 @@ package com.linhlx.shapeservice.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.sql.DataSource;
@@ -36,15 +37,26 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().ignoringAntMatchers("/api/**")
+        http.csrf().ignoringAntMatchers("/api/**", "/signup")
                 .and()
                 .authorizeRequests()
+                .antMatchers("/js/**", "/css/**").permitAll()
+                .antMatchers("/signup").permitAll()
+                .antMatchers(HttpMethod.POST, "/signup").permitAll()
                 .antMatchers("/admin/**").hasRole("ADMIN")
                 .antMatchers("/**").authenticated()
-                .antMatchers("/static/**").permitAll()
-
                 .and().httpBasic()
                 .and().formLogin();
+//        http.csrf().disable();
+//        http.cors();
+//        http.authorizeRequests().antMatchers("/js/**", "/css/**").permitAll()
+//                .antMatchers("/signup").permitAll()
+//                .antMatchers(HttpMethod.POST, "/signup").permitAll()
+//                .antMatchers("/admin/**").hasRole("ADMIN")
+//                .antMatchers("/**", "/api/**").fullyAuthenticated();
+//        http.httpBasic();
+//        http.formLogin();
+//        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.NEVER);
     }
 
     @Bean

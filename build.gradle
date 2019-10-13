@@ -30,8 +30,10 @@ dependencies {
 	compile group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '2.1.9.RELEASE'
 	compile group: 'com.google.guava', name: 'guava', version: '22.0'
 	compile group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf'
+	compile group: 'org.thymeleaf.extras', name: 'thymeleaf-extras-springsecurity5', version: '3.0.4.RELEASE'
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 }
+
 
 dependencyManagement {
 	imports {

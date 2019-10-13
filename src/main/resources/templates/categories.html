@@ -5,16 +5,16 @@
 <div class="container">
     <h1 class="my-4">
         Category management
-        <button type="button" class="btn btn-primary" data-toggle="modal" href="#exampleModal">
+        <button type="button" class="btn btn-primary" data-toggle="modal" href="#formModal">
             Create category
         </button>
     </h1>
 
-    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="formModal" tabindex="-1" role="dialog" aria-labelledby="formModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Modal title</h5>
+                    <h5 class="modal-title">Form</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -74,20 +74,25 @@
                     <th>Formula</th>
                     <th>Rules</th>
                     <th>Conditions to fall under other categories</th>
+                    <th>Action</th>
                 </tr>
                 <tr th:each="category : ${categories}" class="category">
-                    <td th:text="${category.shapeCategoryName}" class="username"></td>
-                    <td>
-                        <th:block th:each="dimension : ${category.dimensions}">
-                            [[${dimension}]]<br>
-                        </th:block>
+                    <td th:text="${category.shapeCategoryName}" class="shapeCategoryName"></td>
+                    <td class="dimensions">
+                        <p th:each="dimension : ${category.dimensions}">
+                            [[${dimension}]]
+                        </p>
                     </td>
-                    <td th:text="${category.formula}" class="role"></td>
-                    <td th:text="${category.rules}"></td>
-                    <td>
-                        <div th:each="condition : ${category.conditionsOtherCategories}">
+                    <td th:text="${category.formula}" class="formula"></td>
+                    <td th:text="${category.rules}" class="rules"></td>
+                    <td class="conditionList">
+                        <div th:each="condition : ${category.conditionsOtherCategories}" class="condition">
                             <b th:text="${condition.key}"></b> when <i th:text="${condition.value}"></i>;
                         </div>
+                    </td>
+                    <td>
+                        <button class="btn btn-warning edit" data-toggle="modal" href="#formModal">Edit</button>
+                        <button class="btn btn-danger delete">Delete</button>
                     </td>
                 </tr>
             </table>
@@ -98,6 +103,6 @@
 <footer>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
-    <script type="text/javascript" th:src="@{/category.js}"></script>
+    <script type="text/javascript" th:src="@{/js/category.js}"></script>
 </footer>
 </html>

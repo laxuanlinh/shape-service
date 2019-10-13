@@ -1,6 +1,6 @@
 package com.linhlx.shapeservice.service;
 
-import com.linhlx.shapeservice.dto.PostedUserDTO;
+import com.linhlx.shapeservice.dto.UserDetailsDTO;
 import com.linhlx.shapeservice.dto.UserDTO;
 import com.linhlx.shapeservice.exception.UserException;
 import com.linhlx.shapeservice.model.Role;
@@ -44,31 +44,31 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO createUser(PostedUserDTO postedUserDTO) {
-        if (userRepository.findById(postedUserDTO.getUsername()).isPresent()){
+    public UserDTO createUser(UserDetailsDTO userDetailsDTO) {
+        if (userRepository.findById(userDetailsDTO.getUsername()).isPresent()){
             throw new UserException("Username already exists");
         }
-        User user = new User(postedUserDTO.getUsername(), encoder.encode(postedUserDTO.getPassword()), true, null);
-        Role role = new Role(postedUserDTO.getRole(), user);
+        User user = new User(userDetailsDTO.getUsername(), encoder.encode(userDetailsDTO.getPassword()), true, null);
+        Role role = new Role(userDetailsDTO.getRole(), user);
         user.setRole(role);
 
         return saveUser(user);
     }
 
     @Override
-    public UserDTO updateUser(PostedUserDTO postedUserDTO) {
-        User user = userRepository.findById(postedUserDTO.getUsername())
+    public UserDTO updateUser(UserDetailsDTO userDetailsDTO) {
+        User user = userRepository.findById(userDetailsDTO.getUsername())
                 .orElseThrow(()->new UserException("User not found"));
-        if (Strings.isNotEmpty(postedUserDTO.getPassword()))
-            user.setPassword(encoder.encode(postedUserDTO.getPassword()));
-        if (Strings.isNotEmpty(postedUserDTO.getRole()))
-            user.getRole().setAuthority(postedUserDTO.getRole());
+        if (Strings.isNotEmpty(userDetailsDTO.getPassword()))
+            user.setPassword(encoder.encode(userDetailsDTO.getPassword()));
+        if (Strings.isNotEmpty(userDetailsDTO.getRole()))
+            user.getRole().setAuthority(userDetailsDTO.getRole());
         return saveUser(user);
     }
 
     private UserDTO saveUser(User user){
         user = userRepository.save(user);
-
+        roleRepository.save(user.getRole());
         return new UserDTO(user);
     }
 
@@ -81,4 +81,33 @@ public class UserServiceImpl implements UserService {
 
         return new UserDTO(user);
     }
+
+    @Override
+    public UserDTO signUp(UserDetailsDTO userDetailsDTO) {
+        userDetailsDTO.setRole("ROLE_USER");
+        return createUser(userDetailsDTO);
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

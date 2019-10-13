@@ -1,6 +1,6 @@
 package com.linhlx.shapeservice.controller;
 
-import com.linhlx.shapeservice.dto.PostedUserDTO;
+import com.linhlx.shapeservice.dto.UserDetailsDTO;
 import com.linhlx.shapeservice.dto.UserDTO;
 import com.linhlx.shapeservice.service.UserService;
 import org.junit.Before;
@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -68,11 +67,11 @@ public class UserControllerTest {
     }
 
     private void whenUpdateUser() {
-        responseEntity = userController.updateUser(new PostedUserDTO());
+        responseEntity = userController.updateUser(new UserDetailsDTO());
     }
 
     private void whenCreateUser() {
-        responseEntity = userController.createUser(new PostedUserDTO());
+        responseEntity = userController.createUser(new UserDetailsDTO());
     }
 
     private void whenRequestViewUsers() {

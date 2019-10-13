@@ -4,30 +4,23 @@ $(function() {
     var edit = false;
 
     $(document).on("click", "#submit", function(){
-    console.log("submitting");
         var username = $("#username").val();
         var password = $("#password").val();
         var role = $("#role").val();
-        var postedUserDTO = { username: username, password: password, role: role };
+        var userDetailsDTO = { username: username, password: password, role: role };
         if(!formIsValid()){
             return;
         }
-        console.log("something here");
-        if(edit){
-            editUser(postedUserDTO);
-        } else {
-            createUser(postedUserDTO);
-        }
+        saveUser(userDetailsDTO);
     });
 
-    function createUser(postedUserDTO){
-        console.log("creating");
+    function saveUser(userDetailsDTO){
         $.ajax({
             url: "/admin/users",
-            method: "POST",
+            method: edit ? "PUT" : "POST",
             dataType: "json",
             contentType: "application/json;charset=utf-8",
-            data: JSON.stringify(postedUserDTO),
+            data: JSON.stringify(userDetailsDTO),
             beforeSend: function(xhr){
                 xhr.setRequestHeader(header, token);
             },
@@ -55,25 +48,6 @@ $(function() {
         }
 
         return true;
-    }
-
-    function editUser(postedUserDTO){
-        $.ajax({
-            url: "/admin/users",
-            method: "PUT",
-            dataType: "json",
-            contentType: "application/json;charset=utf-8",
-            data: JSON.stringify(postedUserDTO),
-            beforeSend: function(xhr){
-                xhr.setRequestHeader(header, token);
-            },
-            success: function(result){
-                location.reload(true);
-            },
-            error: function(e){
-                alert(e.responseJSON.message);
-            }
-        })
     }
 
     $(".edit").click(function(){
