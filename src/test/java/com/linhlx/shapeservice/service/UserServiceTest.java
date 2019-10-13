@@ -41,6 +41,11 @@ public class UserServiceTest {
         passwordEncoder = mock(PasswordEncoder.class);
         userService = new UserServiceImpl(userRepository, roleRepository, passwordEncoder);
 
+        setUpUser();
+        setUpWhen();
+    }
+
+    private void setUpUser(){
         roleUser = new Role();
         roleUser.setAuthority("ROLE_USER");
         roleAdmin = new Role();
@@ -53,6 +58,9 @@ public class UserServiceTest {
         user2.setUsername("users-2");
         user2.setRole(roleUser);
         user2.setEnabled(true);
+    }
+
+    private void setUpWhen(){
         when(userRepository.findAll()).thenReturn(newArrayList(user1, user2));
 
         when(userRepository.save(any())).thenReturn(user1);
@@ -72,13 +80,23 @@ public class UserServiceTest {
     @Test
     public void shouldCreateUser(){
         givenUserDetailsDTO();
+        givenUserNotExists();
         whenCreateUser();
         shouldReturnUserDTO();
+    }
+
+    @Test(expected = UserException.class)
+    public void shouldThrowExceptionWhenUserExistsWhenCreate(){
+        givenUserDetailsDTO();
+        givenUserExists();
+        givenUserExists();
+        whenCreateUser();
     }
 
     @Test
     public void shouldEditUser(){
         givenUserDetailsDTOWithRoleADMIN();
+        givenReturnRoleAdminWhenSaveAdmin();
         whenUpdateUser();
         shouldReturnUserDTOWithRleADMIN();
     }
@@ -97,16 +115,29 @@ public class UserServiceTest {
     }
 
     @Test(expected = UserException.class)
-    public void shouldThrowExceptionWhenRoleNotFoundWhenUpdate(){
-        givenUserDetailsDTO();
-        givenUserCannotBeFound();
-        whenUpdateUser();
-    }
-
-    @Test(expected = UserException.class)
     public void shouldThrowExceptionWhenUserNotFoundWhenDelete(){
         givenUserCannotBeFound();
         whenDeleteUser();
+    }
+
+    @Test
+    public void shouldSignUp(){
+        givenSignUpUser();
+        givenUserNotExists();
+        whenSignUp();
+        shouldReturnUserDTO();
+    }
+
+    private void givenUserExists() {
+        when(userRepository.findById(anyString())).thenReturn(Optional.of(user1));
+    }
+
+    private void whenSignUp() {
+        userDTO = userService.signUp(userDetailsDTO);
+    }
+
+    private void givenSignUpUser() {
+        userDetailsDTO = new UserDetailsDTO("users-3", "password", null, null);
     }
 
     private void givenUserCannotBeFound() {
@@ -133,6 +164,9 @@ public class UserServiceTest {
 
     private void givenUserDetailsDTOWithRoleADMIN() {
         userDetailsDTO = new UserDetailsDTO("users-1", "password", "ROLE_ADMIN", true);
+    }
+
+    private void givenReturnRoleAdminWhenSaveAdmin(){
         when(roleRepository.save(any())).thenReturn(roleAdmin);
     }
 
@@ -145,8 +179,11 @@ public class UserServiceTest {
     }
 
     private void whenCreateUser() {
-        when(userRepository.findById(any())).thenReturn(empty());
         userDTO = userService.createUser(userDetailsDTO);
+    }
+
+    private void givenUserNotExists(){
+        when(userRepository.findById(any())).thenReturn(empty());
     }
 
     private void shouldReturnUserDTO() {

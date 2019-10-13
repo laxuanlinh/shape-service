@@ -15,7 +15,7 @@ import java.security.Principal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/shapes")
+@RequestMapping("/api")
 public class ShapeRestController {
 
     private final ShapeService shapeService;
@@ -25,12 +25,12 @@ public class ShapeRestController {
         this.shapeService = shapeService;
     }
 
-    @RequestMapping(value = "", method = RequestMethod.GET)
+    @RequestMapping(value = "/shapes", method = RequestMethod.GET)
     public ResponseEntity<List<ShapeDTO>> getAllShapes(){
         return new ResponseEntity<>(shapeService.getAllShapes(), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "", method = RequestMethod.POST)
+    @RequestMapping(value = "/shapes", method = RequestMethod.POST)
     public ResponseEntity<Long> createShape(@RequestBody Shape shape, Principal currentUser){
         User user = new User();
         user.setUsername(currentUser.getName());
@@ -44,7 +44,7 @@ public class ShapeRestController {
         return new ResponseEntity<>(shapeService.getAllShapeCategories(), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/area", method = RequestMethod.POST)
+    @RequestMapping(value = "/shapes/area", method = RequestMethod.POST)
     public ResponseEntity<AreaDTO> calculateArea(@RequestBody Shape shape){
         return new ResponseEntity<>(shapeService.getArea(shape), HttpStatus.OK);
     }

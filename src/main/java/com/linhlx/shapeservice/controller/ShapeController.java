@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import java.security.Principal;
 
 @Controller
-@RequestMapping("/shapes")
+@RequestMapping("")
 public class ShapeController {
 
     private final ShapeService shapeService;

@@ -47,16 +47,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/**").authenticated()
                 .and().httpBasic()
                 .and().formLogin();
-//        http.csrf().disable();
-//        http.cors();
-//        http.authorizeRequests().antMatchers("/js/**", "/css/**").permitAll()
-//                .antMatchers("/signup").permitAll()
-//                .antMatchers(HttpMethod.POST, "/signup").permitAll()
-//                .antMatchers("/admin/**").hasRole("ADMIN")
-//                .antMatchers("/**", "/api/**").fullyAuthenticated();
-//        http.httpBasic();
-//        http.formLogin();
-//        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.NEVER);
     }
 
     @Bean

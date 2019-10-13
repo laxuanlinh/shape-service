@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
-@RequestMapping(value = "/admin/shapes/categories")
+@RequestMapping(value = "/admin/categories")
 public class AdminCategoryController {
 
     private final ShapeService shapeService;

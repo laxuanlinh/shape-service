@@ -16,7 +16,6 @@ public interface ShapeService {
     List<ShapeDTO> getAllShapesForUser(String username);
     Shape saveShape(Shape shape);
     AreaDTO getArea(Shape shape);
-//    Shape updateShape(Shape updateInfo);
     Long deleteShape(Long id);
 
     List<ShapeCategoryDTO> getAllShapeCategories();

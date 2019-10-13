@@ -42,6 +42,7 @@ public class ShapeServiceTest {
     private User user;
     private ShapeCategoryDTO shapeCategoryDTO;
     private List<String> otherCategories;
+    private Long deletedId;
 
     @Before
     public void setUp(){
@@ -95,6 +96,7 @@ public class ShapeServiceTest {
         when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
         when(shapeRepository.findAllByUsername(anyString())).thenReturn(shapes);
         when(shapeCategoryRepository.save(any())).thenReturn(rectangleShapeCategory);
+        when(shapeRepository.findById(any())).thenReturn(Optional.of(shape));
     }
 
     @Test
@@ -174,7 +176,7 @@ public class ShapeServiceTest {
     public void shouldThrowExceptionWhenCalculateAndCategoryNotFound(){
         givenCalculatedShape();
         withRadius(10.0);
-        givenInvalidCateogory();
+        givenCategoryNotFound();
         whenGetArea();
     }
 
@@ -183,6 +185,7 @@ public class ShapeServiceTest {
         givenCalculatedShape();
         withRadius(10.0);
         butFormulaInvalid();
+        givenReturnCircleWhenFindByDimensions();
         whenGetArea();
     }
 
@@ -198,6 +201,7 @@ public class ShapeServiceTest {
         givenCalculatedShape();
         withRadius(10.0);
         butRulesInvalid();
+        givenReturnCircleWhenFindByDimensions();
         whenGetArea();
     }
 
@@ -212,6 +216,30 @@ public class ShapeServiceTest {
         givenRectangleWithEvenWidthAndLength();
         whenGetOtherCategories();
         shouldReturnOtherCategories();
+    }
+
+    @Test
+    public void shouldDeleteShape(){
+        whenDeleteShape();
+        deletedIdShouldBeReturned();
+    }
+
+    @Test(expected = ShapeException.class)
+    public void shouldThrowExceptionWhenShapeNotFound(){
+        givenShapeNotFound();
+        whenDeleteShape();
+    }
+
+    private void givenShapeNotFound() {
+        when(shapeRepository.findById(any())).thenReturn(Optional.empty());
+    }
+
+    private void whenDeleteShape() {
+        deletedId = shapeService.deleteShape(1l);
+    }
+
+    private void deletedIdShouldBeReturned(){
+        assertTrue(Long.valueOf(1l).equals(deletedId));
     }
 
     private void shouldReturnOtherCategories() {
@@ -249,15 +277,17 @@ public class ShapeServiceTest {
 
     private void butRulesInvalid() {
         circleShapeCategory.setRules("radius > 0 abcabc");
+    }
+
+    private void givenReturnCircleWhenFindByDimensions(){
         when(shapeCategoryRepository.getShapeCategoryByDimensions(anySet())).thenReturn(Lists.newArrayList(circleShapeCategory));
     }
 
     private void butFormulaInvalid() {
         circleShapeCategory.setFormula("radius * radius * 3.14 abcabc");
-        when(shapeCategoryRepository.getShapeCategoryByDimensions(anySet())).thenReturn(Lists.newArrayList(circleShapeCategory));
     }
 
-    private void givenInvalidCateogory() {
+    private void givenCategoryNotFound() {
         when(shapeCategoryRepository.getShapeCategoryByDimensions(anySet())).thenReturn(Lists.newArrayList());
     }
 
@@ -313,7 +343,7 @@ public class ShapeServiceTest {
         Map<String, Double> sizes = Maps.newHashMap();
         sizes.put("length", 200.0);
         shape = new Shape(1l, "created shape", sizes, rectangleShapeCategory, user, true);
-        when(shapeRepository.save(shape)).thenReturn(shape);
+//        when(shapeRepository.save(shape)).thenReturn(shape);
     }
 
     private void whenCreateShape() {
