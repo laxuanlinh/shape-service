@@ -1,7 +1,7 @@
 package com.linhlx.shapeservice.controller;
 
-import com.linhlx.shapeservice.dto.UserDetailsDTO;
 import com.linhlx.shapeservice.dto.UserDTO;
+import com.linhlx.shapeservice.dto.UserDetailsDTO;
 import com.linhlx.shapeservice.service.UserService;
 import org.junit.Before;
 import org.junit.Test;

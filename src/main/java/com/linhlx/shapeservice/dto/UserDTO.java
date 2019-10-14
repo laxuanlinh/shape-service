@@ -6,7 +6,6 @@ public class UserDTO {
 
     private String username;
     private String role;
-
     private Boolean enabled;
 
     public UserDTO(User user){

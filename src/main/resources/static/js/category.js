@@ -35,7 +35,7 @@ $(function(){
         }
 
         $.ajax({
-            url: "/admin/shapes/categories",
+            url: "/admin/categories",
             method: "POST",
             dataType: "json",
             contentType: "application/json;charset=utf-8",

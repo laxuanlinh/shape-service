@@ -1,7 +1,7 @@
 package com.linhlx.shapeservice.service;
 
-import com.linhlx.shapeservice.dto.UserDetailsDTO;
 import com.linhlx.shapeservice.dto.UserDTO;
+import com.linhlx.shapeservice.dto.UserDetailsDTO;
 import com.linhlx.shapeservice.exception.UserException;
 import com.linhlx.shapeservice.model.Role;
 import com.linhlx.shapeservice.model.User;

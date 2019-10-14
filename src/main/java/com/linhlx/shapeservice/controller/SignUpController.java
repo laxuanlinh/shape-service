@@ -29,7 +29,7 @@ public class SignUpController {
 
     @RequestMapping(value = "", method = RequestMethod.POST)
     public ResponseEntity<UserDTO> signUp(@RequestBody UserDetailsDTO userDetailsDTO){
-        return new ResponseEntity<>(userService.signUp(userDetailsDTO), HttpStatus.OK);
+        return new ResponseEntity<>(userService.signUp(userDetailsDTO), HttpStatus.CREATED);
     }
 
 }

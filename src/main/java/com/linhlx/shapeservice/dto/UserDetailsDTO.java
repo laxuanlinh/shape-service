@@ -16,12 +16,6 @@ public class UserDetailsDTO {
         this.enabled = enabled;
     }
 
-    public UserDetailsDTO(User user){
-        this.username = user.getUsername();
-        this.password = user.getPassword();
-        this.role = user.getRole().getAuthority();
-    }
-
     public String getUsername() {
         return username;
     }

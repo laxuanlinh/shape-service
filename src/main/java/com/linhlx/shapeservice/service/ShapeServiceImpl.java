@@ -101,6 +101,10 @@ public class ShapeServiceImpl implements ShapeService {
         for (String dimension : shape.getShapeCategory().getDimensions()) {
             this.checkIfShapeHasDimension(shape, dimension);
         }
+        this.checkIfShapeHasMoreDimensionsThanCategory(shape);
+    }
+
+    private void checkIfShapeHasMoreDimensionsThanCategory(Shape shape){
         if (shape.getSizes().size() > shape.getShapeCategory().getDimensions().size())
             throw new ShapeException("Shape " + shape.getShapeName() + " cannot have more dimensions than category");
     }
@@ -111,11 +115,15 @@ public class ShapeServiceImpl implements ShapeService {
     }
 
     private void validateShapeRules(Shape shape) {
-        if (!Strings.isNullOrEmpty(shape.getShapeCategory().getRules())) {
+        if (this.hasRules(shape)) {
             String[] ruleTermArr = shape.getShapeCategory().getRules().split(" ");
             String ruleExpressionValues = this.replaceTermsWithValues(shape.getSizes(), ruleTermArr);
             this.evaluateRuleExpression(ruleExpressionValues);
         }
+    }
+
+    private Boolean hasRules(Shape shape){
+        return !Strings.isNullOrEmpty(shape.getShapeCategory().getRules());
     }
 
     private void evaluateRuleExpression(String expression){

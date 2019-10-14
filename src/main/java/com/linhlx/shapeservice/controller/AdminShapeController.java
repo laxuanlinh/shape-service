@@ -1,5 +1,6 @@
 package com.linhlx.shapeservice.controller;
 
+import com.linhlx.shapeservice.dto.ShapeDTO;
 import com.linhlx.shapeservice.model.Shape;
 import com.linhlx.shapeservice.service.ShapeService;
 import com.linhlx.shapeservice.service.UserService;
@@ -36,15 +37,15 @@ public class AdminShapeController {
     }
 
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public ResponseEntity<Long> createShape(@RequestBody Shape shape){
-        Shape createdShape = shapeService.saveShape(shape);
-        return new ResponseEntity<>(createdShape.getId(), HttpStatus.CREATED);
+    public ResponseEntity<ShapeDTO> createShape(@RequestBody Shape shape){
+        ShapeDTO createdShape = new ShapeDTO(shapeService.saveShape(shape));
+        return new ResponseEntity<>(createdShape, HttpStatus.CREATED);
     }
 
     @RequestMapping(value = "", method = RequestMethod.PUT)
-    public ResponseEntity<Long> updateShape(@RequestBody Shape shape){
-        Shape updatedShape = shapeService.saveShape(shape);
-        return new ResponseEntity<>(updatedShape.getId(), HttpStatus.OK);
+    public ResponseEntity<ShapeDTO> updateShape(@RequestBody Shape shape){
+        ShapeDTO updatedShape = new ShapeDTO(shapeService.saveShape(shape));
+        return new ResponseEntity<>(updatedShape, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)

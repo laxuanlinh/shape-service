@@ -10,13 +10,13 @@ insert into dimension (shape_category_name, dimension) values ('Circle', 'radius
 insert into dimension (shape_category_name, dimension) values ('Oval', 'majorradius');
 insert into dimension (shape_category_name, dimension) values ('Oval', 'minorradius');
 
+insert into users(username, password, enabled) values ('admin', '$2a$10$8JisTCAw.H7ilmIGguNwAOHnSXLp.E7SmWcQa5A/HUY2CT9ydx0Re', true);
+insert into authorities(id, username, authority) values (1,'admin', 'ROLE_ADMIN');
+
 insert into users(username, password, enabled) values ('laxuanlinh', '$2a$10$HnfRIDTI7y.hlPisMfXeFuGHkqLaD/95bS4ICCROdFqO4KkzRK3yi', true);
-insert into authorities(id, username, authority) values (1,'laxuanlinh', 'ROLE_ADMIN');
+insert into authorities(id, username, authority) values (2,'laxuanlinh', 'ROLE_USER');
 
-insert into users(username, password, enabled) values ('laxuanlinh2', '$2a$10$HnfRIDTI7y.hlPisMfXeFuGHkqLaD/95bS4ICCROdFqO4KkzRK3yi', true);
-insert into authorities(id, username, authority) values (2,'laxuanlinh2', 'ROLE_USER');
-
-insert into shape (shape_id, shape_name, shape_category_name, username, enabled) values (1, 'my rectangle', 'Rectangle','laxuanlinh', true  );
+insert into shape (shape_id, shape_name, shape_category_name, username, enabled) values (1, 'my rectangle', 'Rectangle','admin', true  );
 
 
 insert into size(shape_id, name, size) values (1, 'width', 10);

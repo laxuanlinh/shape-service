@@ -49,7 +49,7 @@ public class ShapeRestController {
         return new ResponseEntity<>(shapeService.getArea(shape), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/other_categories", method = RequestMethod.POST)
+    @RequestMapping(value = "/shapes/other_categories", method = RequestMethod.POST)
     public ResponseEntity<List<String>> getOtherCategories(@RequestBody Shape shape){
         return new ResponseEntity<>(shapeService.getOtherCategories(shape), HttpStatus.OK);
     }
