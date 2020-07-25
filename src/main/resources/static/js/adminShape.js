@@ -14,8 +14,9 @@ $(function(){
         $("#sizes").html("");
         var selectData = $("#shapeCategoryName").find(':selected').data('dimensions')
         dimensions = selectData.substring(1, selectData.length-1).replace(" ","").split(",");
-        for(dimension of dimensions){
-            $("#sizes").append(" " + dimension + ": <input type='number' name='"+dimension.trim()+"' class='dimension form-control' id='" + dimension.trim() + "'/>");
+        for(var i in dimensions){
+            dimensions[i] = dimensions[i].trim();
+            $("#sizes").append(" " + dimensions[i] + ": <input type='number' name='"+dimensions[i]+"' class='dimension form-control' id='" + dimensions[i] + "'/>");
         }
     }
 

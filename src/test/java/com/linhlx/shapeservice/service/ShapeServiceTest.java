@@ -264,7 +264,7 @@ public class ShapeServiceTest {
     }
 
     private void whenCreateCategory() {
-        shapeCategoryDTO = shapeService.createCategory(rectangleShapeCategory);
+        shapeCategoryDTO = shapeService.saveCategory(rectangleShapeCategory);
     }
 
     private void whenCreateShapeWithCurrentUser() {

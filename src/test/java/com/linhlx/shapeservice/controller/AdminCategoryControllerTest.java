@@ -25,7 +25,7 @@ public class AdminCategoryControllerTest {
         shapeService = mock(ShapeService.class);
         model = mock(Model.class);
         adminCategoryController = new AdminCategoryController(shapeService);
-        when(shapeService.createCategory(any())).thenReturn(new ShapeCategoryDTO());
+        when(shapeService.saveCategory(any())).thenReturn(new ShapeCategoryDTO());
     }
 
     @Test

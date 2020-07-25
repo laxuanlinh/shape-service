@@ -31,7 +31,7 @@ public class AdminCategoryController {
 
     @RequestMapping(value = "", method = RequestMethod.POST)
     public ResponseEntity<ShapeCategoryDTO> createCategory(@RequestBody ShapeCategory shapeCategory){
-        return new ResponseEntity<>(shapeService.createCategory(shapeCategory), HttpStatus.CREATED);
+        return new ResponseEntity<>(shapeService.saveCategory(shapeCategory), HttpStatus.CREATED);
     }
 
 }

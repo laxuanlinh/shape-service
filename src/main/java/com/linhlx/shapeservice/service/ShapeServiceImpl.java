@@ -20,7 +20,9 @@ import org.springframework.stereotype.Service;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -208,7 +210,7 @@ public class ShapeServiceImpl implements ShapeService {
     }
 
     @Override
-    public ShapeCategoryDTO createCategory(ShapeCategory shapeCategory) {
+    public ShapeCategoryDTO saveCategory(ShapeCategory shapeCategory) {
         return new ShapeCategoryDTO(shapeCategoryRepository.save(shapeCategory));
     }
 

@@ -20,6 +20,6 @@ public interface ShapeService {
 
     List<ShapeCategoryDTO> getAllShapeCategories();
     List<String> getOtherCategories(Shape editedShape);
-    ShapeCategoryDTO createCategory(ShapeCategory shapeCategory);
+    ShapeCategoryDTO saveCategory(ShapeCategory shapeCategory);
 
 }
